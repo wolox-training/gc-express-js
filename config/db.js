@@ -1,23 +1,28 @@
-{
-  "development": {
-    "username": "venta_albumes",
-    "password": 1234,
-    "database": "db_venta_albumes",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+const config = require('../config').common.database;
+
+module.exports = {
+  development: {
+    username: config.username,
+    password: config.password,
+    database: config.name,
+    host: config.host,
+    dialect: 'postgres',
+    logging: true
   },
-  "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+  testing: {
+    username: config.username,
+    password: config.password,
+    database: config.name,
+    host: config.host,
+    dialect: 'postgres',
+    logging: false
   },
-  "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+  production: {
+    username: config.username,
+    password: config.password,
+    database: config.name,
+    host: config.host,
+    dialect: 'postgres',
+    logging: false
   }
-}
+};

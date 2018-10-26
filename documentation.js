@@ -5,21 +5,11 @@ dictum.document({
   description: 'This endpoint allow add users to data base',
   endpoint: '/user/save',
   method: 'GET',
-  requestHeaders: {
-    /* headers for endpoint */
-  },
-  requestPathParams: {
-    /* path params for endpoint */
-  },
-  requestBodyParams: {
-    /* body params for endpoint */
-  },
+  requestHeaders: {},
+  requestPathParams: {},
+  requestBodyParams: {},
   responseStatus: 200,
-  responseHeaders: {
-    /* headers for response */
-  },
-  responseBody: {
-    /* body params for response */
-  },
+  responseHeaders: {},
+  responseBody: {},
   resource: 'My Resource'
 });

@@ -1,5 +1,4 @@
-const User = require('../models/user');
-
+const User = require('../models').User;
 const logger = require('../logger');
 
 exports.userPost = (req, res) => {

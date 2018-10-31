@@ -9,7 +9,7 @@ const faker = require('faker'),
  *
  * @return {Object}       An object to build the user from.
  */
-const data = async (props = {}) => {
+const data = (props = {}) => {
   const defaultProps = {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
@@ -26,15 +26,15 @@ const data = async (props = {}) => {
  * @return {Object}       A user instance
  */
 // exports.userFactory = async (props = {}) => models.User.create(await data(props));
-exports.default = async (props = {}) => {
-  const user = await data(props);
+exports.default = (props = {}) => {
+  const user = data(props);
   return user;
 };
 
-exports.listOfUsers = async (props = {}) => {
+exports.listOfUsers = (props = {}) => {
   const users = [];
-  users.push(await data(props));
-  users.push(await data(props));
-  users.push(await data(props));
+  users.push(data(props));
+  users.push(data(props));
+  users.push(data(props));
   return users;
 };

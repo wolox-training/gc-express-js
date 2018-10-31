@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         validate: {
           is: {
-            args: ['/^[a-zA-Z0-9]+$/'],
+            args: [/^[a-zA-Z0-9]*$/],
             msg: 'Password require alphanumeric value.'
           },
           len: {

@@ -1,11 +1,11 @@
 // Require the dev-dependencies
-const _ = require('lodash');
-const chai = require('chai');
-const expect = require('chai').expect;
-const chaiHttp = require('chai-http');
-const User = require('../../../app/models').User;
-const server = require('../../../app');
-const userFactory = require('../../factories/user');
+const _ = require('lodash'),
+  chai = require('chai'),
+  expect = require('chai').expect,
+  chaiHttp = require('chai-http'),
+  User = require('../../../app/models').User,
+  server = require('../../../app'),
+  userFactory = require('../../factories/user');
 
 const should = chai.should();
 chai.use(chaiHttp);
@@ -21,8 +21,17 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .post('/users')
       .send(userTest)
       .then(res => {
-        expect(res).to.have.status(200);
+        expect(res).to.have.status(201);
         expect(res.body.message).to.equal('Created user.');
+      });
+  });
+  it('GET: it should return the created user.', () => {
+    chai
+      .request(server)
+      .get('/user/1')
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res.body.message).to.equal('User found.');
       });
   });
   it('POST: it should don`t create user. Domain of email isn`t "wolox".', () => {

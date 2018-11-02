@@ -11,13 +11,13 @@ exports.userPost = (req, res, next) => {
 
   return createUser
     .then(user => {
-      res.status(201).send({ userId: user.id, message: 'Created user.' });
+      res.status(201).send({ user, message: 'Created user.' });
     })
     .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
 };
 
 exports.getUser = (req, res, next) => {
-  const userFound = User.findById(req.param('id'));
+  const userFound = User.findById(req.params.id);
 
   return userFound
     .then(user => {

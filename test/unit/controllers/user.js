@@ -23,17 +23,13 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .then(res => {
         expect(res).to.have.status(201);
         expect(res.body.message).to.equal('Created user.');
+
+        expect(res.body.user.firstName).to.equal(userTest.firstName);
+        expect(res.body.user.lastName).to.equal(userTest.lastName);
+        expect(res.body.user.email).to.equal(userTest.email);
       });
   });
-  it('GET: it should return the created user.', () => {
-    chai
-      .request(server)
-      .get('/user/1')
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res.body.message).to.equal('User found.');
-      });
-  });
+
   it('POST: it should don`t create user. Domain of email isn`t "wolox".', () => {
     _.set(userTest, 'email', 'emailTest@isnt_wolox.com');
     chai

@@ -120,130 +120,31 @@ describe('Controller: Users/sessions POST', () => {
   context('When requesting with a valid token', () => {
     const futureTime = moment().add(moment.duration(60, 'seconds'));
     const validToken = jwt.createToken({}, futureTime);
-    context('using both query params', () => {
-      it('should return the user', () => {
-        _.set('sessionToken', validToken);
-        chai
-          .request(server)
-          .post('/users/sessions')
-          .send(userTest)
-          .then(res => {
-            // cuando lo mando a autenticar lo busco, y como no lo tengo en la db no lo encuentra y la contraseña que quiere hasear es null
-            expect(res).to.have.status(201);
-          });
-      });
+    it('should return the user', () => {
+      _.set('sessionToken', validToken);
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .then(res => {
+          // cuando lo mando a autenticar lo busco, y como no lo tengo en la db no lo encuentra y la contraseña que quiere hasear es null
+          expect(res).to.have.status(201);
+        });
     });
-    /*
-    context('using only one query param - page >= 1', () => {
-      it('should return the second 3 users, using default limit to 3', done => {
-        chai
-          .request(server)
-          .get(LIST_USERS('', 2))
-          .set('session_token', validToken)
-          .then(res => {
-            res.should.have.status(201);
-            res.body.result.length.should.be.eq(3);
-            res.body.result[0].id.should.be.eq(4);
-            res.body.pages.should.be.eq(2);
-            res.body.count.should.be.eq(6);
-            done();
-          })
-          .catch(console.log);
-      });
-    });
-    context('using only one query param - limit >= 0', () => {
-      it('should return the first page', done => {
-        const limit = 2;
-        chai
-          .request(server)
-          .get(LIST_USERS(limit, ''))
-          .set('session_token', validToken)
-          .then(res => {
-            res.should.have.status(201);
-            res.body.result.length.should.be.eq(limit);
-            res.body.result[0].id.should.be.eq(1);
-            done();
-          })
-          .catch(console.log);
-      });
-    });
-    context('without using query params', () => {
-      it('should return the first page of 3 users, using default values', done => {
-        chai
-          .request(server)
-          .get(LIST_USERS('', ''))
-          .set('session_token', validToken)
-          .then(res => {
-            res.should.have.status(201);
-            res.body.result.length.should.be.eq(3);
-            res.body.result[0].id.should.be.eq(1);
-            res.body.pages.should.be.eq(2);
-            done();
-          })
-          .catch(console.log);
-      });
-    });
-    context('using bad limit', () => {
-      it('should return a page of 3 users, using default value', done => {
-        chai
-          .request(server)
-          .get(LIST_USERS(-2, 2))
-          .set('session_token', validToken)
-          .then(res => {
-            res.should.have.status(201);
-            res.body.result.length.should.be.eq(3);
-            done();
-          })
-          .catch(console.log);
-      });
-    });
-    context('using bad page', () => {
-      it('should return the first page, using default value', done => {
-        chai
-          .request(server)
-          .get(LIST_USERS(2, -2))
-          .set('session_token', validToken)
-          .then(res => {
-            res.should.have.status(201);
-            res.body.result.length.should.be.eq(2);
-            res.body.result[0].id.should.be.eq(1);
-            res.body.pages.should.be.eq(3);
-            done();
-          })
-          .catch(console.log);
-      });
-    });
-    */
   });
-  /*
+  
   context('When requesting with an invalid token', () => {
     const pastTime = moment().subtract(moment.duration(1, 'seconds'));
     const invalidToken = jwt.createToken({}, pastTime);
-    context('no token', () => {
-      it('should return 500', done => {
-        chai
-          .request(server)
-          .get(LIST_USERS(2, 1))
-          .catch(res => {
-            res.status.should.be.eq(500);
-            res.response.body.should.have.property('message');
-            done();
-          });
-      });
-    });
-    context('expired token', () => {
-      it('should return 500', done => {
-        chai
-          .request(server)
-          .get(LIST_USERS(2, 1))
-          .set('session_token', invalidToken)
-          .catch(res => {
-            res.status.should.be.eq(500);
-            res.response.body.should.have.property('message');
-            done();
-          });
-      });
+    it('should return 500', done => {
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .catch(res => {
+          expect(error.response).to.have.status(422);
+          expect(error.response.body.message).to.include.members(['No valid token']);
+        });
     });
   });
-  */
 });

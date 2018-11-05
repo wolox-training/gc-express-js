@@ -24,6 +24,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
         expect(res).to.have.status(201);
         expect(res.body.message).to.equal('Created user.');
 
+        expect(res.body.user).to.have.property('id');
         expect(res.body.user.firstName).to.equal(userTest.firstName);
         expect(res.body.user.lastName).to.equal(userTest.lastName);
         expect(res.body.user.email).to.equal(userTest.email);

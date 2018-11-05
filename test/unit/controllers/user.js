@@ -7,7 +7,9 @@ const _ = require('lodash'),
   server = require('../../../app'),
   userFactory = require('../../factories/user'),
   jwt = require('../../../app/tools/jwtToken'),
-  moment = require('moment');
+  moment = require('moment'),
+  faker = require('faker'),
+  factory = require('factory-girl').factory;
 
 const should = chai.should();
 chai.use(chaiHttp);
@@ -26,6 +28,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
         expect(res).to.have.status(201);
         expect(res.body.message).to.equal('Created user.');
 
+        expect(res.body.user).to.have.property('id');
         expect(res.body.user.firstName).to.equal(userTest.firstName);
         expect(res.body.user.lastName).to.equal(userTest.lastName);
         expect(res.body.user.email).to.equal(userTest.email);
@@ -113,11 +116,23 @@ describe('Controller: Users POST, `src/controller/user`', () => {
 
 describe('Controller: Users/sessions POST', () => {
   let userTest = {};
-  beforeEach(() => {
-    userTest = userFactory.default();
+
+  factory.define('user', User, {
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    email: `${faker.internet.userName()}@wolox.com`,
+    password: faker.random.alphaNumeric(8, 50)
   });
 
-  context('When requesting with a valid token', () => {
+  beforeEach(done => {
+    factory.create('user').then(user => {
+      user.reload();
+      userTest = user.dataValues;
+      done();
+    });
+  });
+
+  context('When requesting with a valid token', done => {
     const futureTime = moment().add(moment.duration(60, 'seconds'));
     const validToken = jwt.createToken({}, futureTime);
     it('should return the user', () => {
@@ -127,23 +142,23 @@ describe('Controller: Users/sessions POST', () => {
         .post('/users/sessions')
         .send(userTest)
         .then(res => {
-          // cuando lo mando a autenticar lo busco, y como no lo tengo en la db no lo encuentra y la contraseña que quiere hasear es null
-          expect(res).to.have.status(201);
+          expect(res).to.have.status(200);
+          done();
         });
     });
   });
-  
-  context('When requesting with an invalid token', () => {
+
+  context('When requesting with an invalid token', done => {
     const pastTime = moment().subtract(moment.duration(1, 'seconds'));
     const invalidToken = jwt.createToken({}, pastTime);
-    it('should return 500', done => {
+    it('should return 422', () => {
       chai
         .request(server)
         .post('/users/sessions')
         .send(userTest)
         .catch(res => {
-          expect(error.response).to.have.status(422);
-          expect(error.response.body.message).to.include.members(['No valid token']);
+          expect(res).to.have.status(422);
+          done();
         });
     });
   });

@@ -46,7 +46,7 @@ exports.authenticate = (req, res, next) => {
           updatedAt: user.updatedAt
         };
 
-        res.status(201).send(userWithToken);
+        res.status(200).send(userWithToken);
       } else {
         next(
           errors.defaultError(

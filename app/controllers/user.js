@@ -1,14 +1,27 @@
-const User = require('../models/user');
+const User = require('../models').User,
+  errors = require('../errors');
 
-const logger = require('../logger');
+exports.userPost = (req, res, next) => {
+  const createUser = User.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    password: req.body.password
+  });
 
-exports.userPost = (req, res) => {
-  User.create(req.body)
+  return createUser
     .then(user => {
-      logger.info('User was created succesfully!');
+      res.status(201).send({ user, message: 'Created user.' });
     })
-    .catch(err => {
-      logger.error('User was not created. ', err.message);
-      return res.status(422).send({ message: err.errors });
-    });
+    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
+};
+
+exports.getUser = (req, res, next) => {
+  const userFound = User.findById(req.params.id);
+
+  return userFound
+    .then(user => {
+      res.status(200).send({ user, message: 'User found.' });
+    })
+    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
 };

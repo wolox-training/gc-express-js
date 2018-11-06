@@ -28,12 +28,10 @@ exports.getUser = (req, res, next) => {
     .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
 };
 
-exports.authenticate = (req, res, next) => {
-  const userFound = User.findOne({ where: { email: req.params.email } });
-
-  return userFound
+exports.generateToken = (req, res, next) => {
+  return User.findOne({ where: { email: req.body.email } })
     .then(user => {
-      const hashedPassword = encode().value(req.params.password);
+      const hashedPassword = encode().value(req.body.password);
       if (user.password === `${hashedPassword}`) {
         const token = jwt.createToken({ userId: user.id });
         const userWithToken = {

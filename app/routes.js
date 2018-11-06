@@ -6,5 +6,5 @@ const users = require('./controllers/user'),
 exports.init = app => {
   app.post('/users', [usersParameterValidator.handle, emailValidator.handle], users.userPost);
   app.post('/getUser/:id', [], users.getUser);
-  app.post('/users/sessions', [sessionParameterValidator.handle, emailValidator.handle], users.authenticate);
+  app.post('/users/sessions', [sessionParameterValidator.handle, emailValidator.handle], users.generateToken);
 };

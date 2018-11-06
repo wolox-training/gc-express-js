@@ -114,7 +114,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
   });
 });
 
-describe('Controller: Users/sessions POST', () => {
+describe.only('Controller: Users/sessions POST', () => {
   let userTest = {};
 
   factory.define('user', User, {
@@ -133,10 +133,7 @@ describe('Controller: Users/sessions POST', () => {
   });
 
   context('When requesting with a valid token', done => {
-    const futureTime = moment().add(moment.duration(60, 'seconds'));
-    const validToken = jwt.createToken({}, futureTime);
     it('should return the user', () => {
-      _.set('sessionToken', validToken);
       chai
         .request(server)
         .post('/users/sessions')
@@ -148,10 +145,23 @@ describe('Controller: Users/sessions POST', () => {
     });
   });
 
-  context('When requesting with an invalid token', done => {
-    const pastTime = moment().subtract(moment.duration(1, 'seconds'));
-    const invalidToken = jwt.createToken({}, pastTime);
+  context('When requesting with an invalid email', done => {
     it('should return 422', () => {
+      _.set(userTest, 'email', 'emailTest@isnt_wolox.com');
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .catch(res => {
+          expect(res).to.have.status(422);
+          done();
+        });
+    });
+  });
+
+  context('When requesting with an invalid password', done => {
+    it('should return 422', () => {
+      _.set(userTest, 'password', 'asdad2*qawe21q');
       chai
         .request(server)
         .post('/users/sessions')

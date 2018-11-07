@@ -6,8 +6,6 @@ const _ = require('lodash'),
   User = require('../../../app/models').User,
   server = require('../../../app'),
   userFactory = require('../../factories/user'),
-  jwt = require('../../../app/tools/jwtToken'),
-  moment = require('moment'),
   faker = require('faker'),
   factory = require('factory-girl').factory;
 

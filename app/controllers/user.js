@@ -1,6 +1,5 @@
 const User = require('../models').User,
   errors = require('../errors'),
-  encode = require('hashcode').hashCode,
   jwt = require('../tools/jwtToken');
 
 exports.userPost = (req, res, next) => {
@@ -31,8 +30,7 @@ exports.getUser = (req, res, next) => {
 exports.generateToken = (req, res, next) => {
   return User.findOne({ where: { email: req.body.email } })
     .then(user => {
-      const hashedPassword = encode().value(req.body.password);
-      if (user.password === `${hashedPassword}`) {
+      if (user.password === req.body.password) {
         const token = jwt.createToken({ userId: user.id });
         const userWithToken = {
           email: user.email,
@@ -46,11 +44,7 @@ exports.generateToken = (req, res, next) => {
 
         res.status(200).send(userWithToken);
       } else {
-        next(
-          errors.defaultError(
-            `Error passwords: DB: ${user.password} VS Req: ${hashedPassword} - Invalid user`
-          )
-        );
+        next(errors.defaultError(`Invalid user`));
       }
     })
     .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));

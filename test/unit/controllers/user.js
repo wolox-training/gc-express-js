@@ -6,8 +6,6 @@ const _ = require('lodash'),
   User = require('../../../app/models').User,
   server = require('../../../app'),
   userFactory = require('../../factories/user'),
-  jwt = require('../../../app/tools/jwtToken'),
-  moment = require('moment'),
   faker = require('faker'),
   factory = require('factory-girl').factory;
 
@@ -44,8 +42,11 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .post('/users')
       .send(userTest)
       .then(res => {
-        expect(res.body.message).to.equal('Invalid email!');
         done();
+      })
+      .catch(error => {
+        expect(error.response).to.have.status(422);
+        expect(error.response.body.message).to.equal('Invalid email!');
       });
   });
 
@@ -56,8 +57,11 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .post('/users')
       .send(userTest)
       .then(res => {
-        expect(res.body.message).to.equal('Invalid password!');
         done();
+      })
+      .catch(error => {
+        expect(error.response).to.have.status(422);
+        expect(error.response.body.message).to.equal('Invalid password!');
       });
   });
   it('POST: it should don`t create user. Password require alphanumeric value.', done => {
@@ -67,8 +71,11 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .post('/users')
       .send(userTest)
       .then(res => {
-        expect(res.body.message).to.equal('Invalid password!');
         done();
+      })
+      .catch(error => {
+        expect(error.response).to.have.status(422);
+        expect(error.response.body.message).to.equal('Invalid password!');
       });
   });
   it('POST: it should don`t create user. Attribute email isn`t valid.', done => {
@@ -78,8 +85,11 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .post('/users')
       .send(userTest)
       .then(res => {
-        expect(res.body.message).to.equal('Invalid email!');
         done();
+      })
+      .catch(error => {
+        expect(error.response).to.have.status(422);
+        expect(error.response.body.message).to.equal('Invalid email!');
       });
   });
   it('POST: it should don`t create user. FirstName, lastName, email and password are attributes don`t passed on request.', done => {
@@ -92,8 +102,11 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .post('/users')
       .send(userTest)
       .then(res => {
-        expect(res.body.message).to.equal('Missing parameters: email,password,firstName,lastName');
         done();
+      })
+      .catch(error => {
+        expect(error.response).to.have.status(422);
+        expect(error.response.body.message).to.equal('Missing parameters: email,password,firstName,lastName');
       });
   });
 });
@@ -137,8 +150,11 @@ describe.only('Controller: Users/sessions POST', () => {
         .post('/users/sessions')
         .send(userTest)
         .then(res => {
-          expect(res.body.message).to.equal('Invalid email!');
           done();
+        })
+        .catch(error => {
+          expect(error.response).to.have.status(422);
+          expect(error.response.body.message).to.equal('Invalid email!');
         });
     });
   });
@@ -151,8 +167,11 @@ describe.only('Controller: Users/sessions POST', () => {
         .post('/users/sessions')
         .send(userTest)
         .then(res => {
-          expect(res.body.message).to.equal('Invalid user');
           done();
+        })
+        .catch(error => {
+          expect(error.response).to.have.status(422);
+          expect(error.response.body.message).to.equal('Invalid user');
         });
     });
   });

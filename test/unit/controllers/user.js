@@ -96,7 +96,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
   });
 });
 
-describe.only('Controller: Users/sessions POST', () => {
+describe('Controller: Users/sessions POST', () => {
   let userTest = {};
 
   factory.define('user', User, {
@@ -154,4 +154,56 @@ describe.only('Controller: Users/sessions POST', () => {
         });
     });
   });
+});
+
+describe.only('Controller: Users GET, `src/controller/user`', () => {
+  const userTest = {};
+
+  factory.define('user', User, {
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    email: `${faker.internet.userName()}@wolox.com`,
+    password: faker.random.alphaNumeric(8, 50)
+  });
+
+  beforeEach(done => {
+    factory.create('user').then(user => {
+      user.reload();
+      userTest = user.dataValues;
+    });
+
+    for (let i = 0; i < 3; i++) {
+      factory.create('user').then(user => {
+        user.reload();
+      });
+    }
+    done();
+  });
+
+  context('When requesting with valid token and parameters', () => {
+    it('should return error message', done => {
+      let request = (limit, page) => `/users?limit=${limit}&page=${page}`;
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .then(res => {
+          
+          chai
+            .request(server)
+            .get(request(2,1))
+            .send(userTest)
+            .then(res => {
+              
+              // expect(res.body.message).to.equal('Invalid user');
+              done();
+            });
+
+          done();
+        });
+      
+    });
+  });
+
+
 });

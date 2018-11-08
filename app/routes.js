@@ -1,6 +1,7 @@
 const users = require('./controllers/user'),
   usersParameterValidator = require('./middlewares/usersValidator'),
   emailValidator = require('./middlewares/emailValidator'),
+  tokenHeaderValidator = require('./middlewares/tokenHeaderValidator'),
   sessionParameterValidator = require('./middlewares/sessionParameterValidator');
 
 exports.init = app => {

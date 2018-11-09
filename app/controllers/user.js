@@ -33,6 +33,7 @@ exports.generateToken = (req, res, next) => {
       if (user.password === req.body.password) {
         const token = jwt.createToken({ userId: user.id });
         const userWithToken = {
+          id: user.id,
           email: user.email,
           password: user.password,
           firstName: user.firstName,
@@ -57,7 +58,11 @@ exports.list = (req, res, next) => {
         limit = req.query.limit && req.query.limit >= 0 ? req.query.limit : 3, // number of records per page
         pages = Math.ceil(data.count / limit),
         offset = limit * (page - 1);
-      return User.findAll({ limit, offset, order: [['id', 'ASC']] }).then(users => {
+      return User.findAll({
+        limit,
+        offset,
+        order: [['id', 'ASC']]
+      }).then(users => {
         res.status(200).json({ result: users, count: data.count, pages });
       });
     })

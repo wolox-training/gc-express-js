@@ -1,10 +1,13 @@
-const errors = require('../errors');
+const errors = require('../errors'),
+  jwt = require('jsonwebtoken'),
+  JWT_KEY = require('../constants').jwt_key;
 
 exports.handle = (req, res, next) => {
-  // Validate fields
-  if (typeof req.headers.sessionToken === 'undefined') {
-    next(errors.defaultError('Missing token!'));
-  }
+  jwt.verify(`${req.body.sessionToken}`, JWT_KEY, (jwtError, decoded) => {
+    if (jwtError) {
+      next(errors.defaultError('Invalid token!'));
+    }
+  });
 
   next();
 };

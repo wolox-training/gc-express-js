@@ -120,13 +120,14 @@ describe.only('Controller: Users/sessions POST', () => {
   });
 
   context('When requesting with a valid token', () => {
-    it('should return the user', done => {
+    it.only('should return the user', done => {
       chai
         .request(server)
         .post('/users/sessions')
         .send(userTest)
         .then(res => {
           expect(res).to.have.status(200);
+          expect(res.body).have.property('sessionToken');
           done();
         });
     });

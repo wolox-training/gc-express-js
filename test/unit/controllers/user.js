@@ -163,7 +163,7 @@ describe('Controller: Users/sessions POST', () => {
   });
 });
 
-describe.only('Controller: Users GET, `src/controller/user`', () => {
+describe('Controller: Users GET, `src/controller/user`', () => {
   let userTest = {};
   const request = (limit, page) => `/users?limit=${limit}&page=${page}`;
 
@@ -265,4 +265,134 @@ describe.only('Controller: Users GET, `src/controller/user`', () => {
         });
     });
   });
+});
+
+describe.only('Controller: Users POST, `src/controller/user`', () => {
+  let userTest = {};
+  let userTest2 = {};
+
+  factory.define('userNotAdmin', User, {
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    email: `${faker.internet.userName()}@wolox.com`,
+    password: faker.random.alphaNumeric(8, 50),
+    admin: 0
+  });
+
+  beforeEach(done => {
+    factory.create('userNotAdmin').then(user => {
+      user.reload();
+      userTest = user.dataValues;
+      // done();
+    });
+
+    factory.build('userNotAdmin').then(user2 => {
+      userTest2 = user2.dataValues;
+      done();
+    });
+  });
+
+  context('When requesting with valid token and parameters', () => {
+    it('should update no admin user to admin user', done => {
+      _.set(userTest, 'admin', 0);
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .then(res => {
+          console.log(userTest2);
+          chai
+            .request(server)
+            .post('/admin/users')
+            .send(res.body)
+            .then(response => {
+              expect(response).to.have.status(200);
+              expect(response.body.admin).to.equal(true);
+              done();
+            });
+        });
+    });
+  });
+
+  context('When requesting with valid token and parameters', () => {
+    it.only('should return new admin user', done => {
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .then(res => {
+          chai
+            .request(server)
+            .post('/admin/users')
+            .send(userTest2)
+            .set('sessionToken', res.body.sessionToken)
+            .then(response => {
+              expect(response).to.have.status(200);
+              expect(response.body.admin).to.equal(true);
+              done();
+            });
+        });
+    });
+  });
+
+  context('When requesting with invalid token', () => {
+    it('shoul return invalid token message', done => {
+      chai
+        .request(server)
+        .post('/admin/users')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res.body.message).to.equal('Invalid token!');
+          done();
+        });
+    });
+  });
+  /*
+  context('When requesting with invalid parameters', () => {
+    it('should return the first page of 3 users, using default values', done => {
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .then(res => {
+          chai
+            .request(server)
+            .get(request('', ''))
+            .set('sessionToken', res.body.sessionToken)
+            .send(res.body)
+            .then(response => {
+              expect(res).to.have.status(200);
+              expect(response.body.result.length).to.equal(3);
+              expect(response.body).have.property('count');
+              expect(response.body).have.property('pages');
+              done();
+            });
+        });
+    });
+  });
+
+  context('When requesting with invalid parameters', () => {
+    it('should return the first page of 3 users, using default values', done => {
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .then(res => {
+          chai
+            .request(server)
+            .get(request(3, -2))
+            .set('sessionToken', res.body.sessionToken)
+            .send(res.body)
+            .then(response => {
+              expect(res).to.have.status(200);
+              expect(response.body.result.length).to.equal(3);
+              expect(response.body).have.property('count');
+              expect(response.body).have.property('pages');
+              done();
+            });
+        });
+    });
+  });
+  */
 });

@@ -5,6 +5,7 @@ const hasAllParameters = body => {
 };
 
 exports.handle = (req, res, next) => {
+  console.log(req.body);
   if (!hasAllParameters(req.body)) {
     next(errors.defaultError('Missing parameters!'));
   }

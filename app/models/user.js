@@ -34,6 +34,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING
       },
+      admin: {
+        required: true,
+        type: DataTypes.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

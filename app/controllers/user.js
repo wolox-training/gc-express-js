@@ -7,7 +7,8 @@ exports.userPost = (req, res, next) => {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    admin: req.body.admin
   });
 
   return createUser
@@ -39,6 +40,7 @@ exports.generateToken = (req, res, next) => {
           firstName: user.firstName,
           lastName: user.lastName,
           sessionToken: token,
+          admin: user.admin,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
         };
@@ -69,4 +71,22 @@ exports.list = (req, res, next) => {
     .catch(error => {
       next(errors.defaultError(`Database error - ${error}`));
     });
+};
+
+exports.admin = (req, res, next) => {
+  return User.findOrCreate({ where: { email: req.body.email } })
+    .spread((user, created) => {
+      console.log(created);
+      if (created) {
+        res.status(201).send(user);
+      }
+      if (user.admin === false) {
+        user.update({ admin: 1 }).then(() => {
+          res.status(200).send(user);
+        });
+      } else {
+        next(errors.defaultError(`Invalid user2`));
+      }
+    })
+    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
 };

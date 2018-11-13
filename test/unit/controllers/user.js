@@ -278,21 +278,18 @@ describe.only('Controller: Users POST, `src/controller/user`', () => {
     lastName: faker.name.lastName(),
     email: `${faker.internet.userName()}@wolox.com`,
     password: faker.random.alphaNumeric(8, 50),
-    admin: 0
+    admin: false
   });
 
-  beforeEach((next, done) => {
+  beforeEach(done => {
     factory.create('userNotAdmin').then(user => {
-      user.reload();
       userTest = user.dataValues;
       userTest.sessionToken = token;
-      next();
-    });
-
-    factory.buildMany('user', 1, [{ email: `${faker.internet.userName()}@wolox.com` }]).then(userBuild => {
-      userTest2 = userBuild[0].dataValues;
-      userTest2.sessionToken = token;
-      done();
+      factory.buildMany('user', 1, [{ email: `${faker.internet.userName()}@wolox.com` }]).then(userBuild => {
+        userTest2 = userBuild[0].dataValues;
+        userTest2.sessionToken = token;
+        done();
+      });
     });
   });
 
@@ -306,6 +303,9 @@ describe.only('Controller: Users POST, `src/controller/user`', () => {
           expect(res).to.have.status(200);
           expect(res.body.admin).to.equal(true);
           done();
+        })
+        .catch(err => {
+          console.log(err);
         });
     });
   });

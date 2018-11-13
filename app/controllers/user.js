@@ -74,14 +74,22 @@ exports.list = (req, res, next) => {
 };
 
 exports.admin = (req, res, next) => {
-  return User.findOrCreate({ where: { email: req.body.email } })
+  return User.findOrCreate({
+    where: {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      password: req.body.password,
+      email: req.body.email,
+      admin: false
+    }
+  })
     .spread((user, created) => {
-      console.log(created);
       if (created) {
-        res.status(201).send(user);
-      }
-      if (user.admin === false) {
-        user.update({ admin: 1 }).then(() => {
+        user.update({ admin: true }).then(() => {
+          res.status(201).send(user);
+        });
+      } else if (user.admin === false) {
+        user.update({ admin: true }).then(() => {
           res.status(200).send(user);
         });
       } else {

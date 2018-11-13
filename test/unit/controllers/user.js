@@ -7,9 +7,9 @@ const _ = require('lodash'),
   server = require('../../../app'),
   userFactory = require('../../factories/user'),
   faker = require('faker'),
-  factory = require('factory-girl').factory;
+  factory = require('factory-girl').factory,
+  jwt = require('../../../app/tools/jwtToken');
 
-const should = chai.should();
 chai.use(chaiHttp);
 
 describe('Controller: Users POST, `src/controller/user`', () => {
@@ -127,6 +127,7 @@ describe('Controller: Users/sessions POST', () => {
         .send(userTest)
         .then(res => {
           expect(res).to.have.status(200);
+          expect(res.body).have.property('sessionToken');
           done();
         });
     });
@@ -270,6 +271,7 @@ describe('Controller: Users GET, `src/controller/user`', () => {
 describe.only('Controller: Users POST, `src/controller/user`', () => {
   let userTest = {};
   let userTest2 = {};
+  const token = jwt.createToken({ userId: 1 });
 
   factory.define('userNotAdmin', User, {
     firstName: faker.name.firstName(),
@@ -279,64 +281,56 @@ describe.only('Controller: Users POST, `src/controller/user`', () => {
     admin: 0
   });
 
-  beforeEach(done => {
+  beforeEach((next, done) => {
     factory.create('userNotAdmin').then(user => {
       user.reload();
       userTest = user.dataValues;
-      // done();
+      userTest.sessionToken = token;
+      next();
     });
 
-    factory.build('userNotAdmin').then(user2 => {
-      userTest2 = user2.dataValues;
+    factory.buildMany('user', 1, [{ email: `${faker.internet.userName()}@wolox.com` }]).then(userBuild => {
+      userTest2 = userBuild[0].dataValues;
+      userTest2.sessionToken = token;
       done();
     });
   });
 
   context('When requesting with valid token and parameters', () => {
     it('should update no admin user to admin user', done => {
-      _.set(userTest, 'admin', 0);
       chai
         .request(server)
-        .post('/users/sessions')
+        .post('/admin/users')
         .send(userTest)
         .then(res => {
-          console.log(userTest2);
-          chai
-            .request(server)
-            .post('/admin/users')
-            .send(res.body)
-            .then(response => {
-              expect(response).to.have.status(200);
-              expect(response.body.admin).to.equal(true);
-              done();
-            });
+          expect(res).to.have.status(200);
+          expect(res.body.admin).to.equal(true);
+          done();
         });
     });
   });
 
   context('When requesting with valid token and parameters', () => {
-    it.only('should return new admin user', done => {
+    it('should return new admin user', done => {
       chai
         .request(server)
-        .post('/users/sessions')
-        .send(userTest)
+        .post('/admin/users')
+        .send(userTest2)
         .then(res => {
-          chai
-            .request(server)
-            .post('/admin/users')
-            .send(userTest2)
-            .set('sessionToken', res.body.sessionToken)
-            .then(response => {
-              expect(response).to.have.status(200);
-              expect(response.body.admin).to.equal(true);
-              done();
-            });
+          expect(res).to.have.status(201);
+          expect(res.body.admin).to.equal(true);
+          expect(res.body).have.property('firstName');
+          expect(res.body).have.property('lastName');
+          expect(res.body).have.property('password');
+          expect(res.body).have.property('email');
+          done();
         });
     });
   });
 
   context('When requesting with invalid token', () => {
     it('shoul return invalid token message', done => {
+      userTest.sessionToken = 'invalid';
       chai
         .request(server)
         .post('/admin/users')
@@ -348,51 +342,19 @@ describe.only('Controller: Users POST, `src/controller/user`', () => {
         });
     });
   });
-  /*
-  context('When requesting with invalid parameters', () => {
-    it('should return the first page of 3 users, using default values', done => {
-      chai
-        .request(server)
-        .post('/users/sessions')
-        .send(userTest)
-        .then(res => {
-          chai
-            .request(server)
-            .get(request('', ''))
-            .set('sessionToken', res.body.sessionToken)
-            .send(res.body)
-            .then(response => {
-              expect(res).to.have.status(200);
-              expect(response.body.result.length).to.equal(3);
-              expect(response.body).have.property('count');
-              expect(response.body).have.property('pages');
-              done();
-            });
-        });
-    });
-  });
 
-  context('When requesting with invalid parameters', () => {
-    it('should return the first page of 3 users, using default values', done => {
+  context('When requesting with invalid email', () => {
+    it('shoul return invalid email message', done => {
+      userTest.email = `${faker.internet.userName()}@not_wolox.com`;
       chai
         .request(server)
-        .post('/users/sessions')
+        .post('/admin/users')
         .send(userTest)
         .then(res => {
-          chai
-            .request(server)
-            .get(request(3, -2))
-            .set('sessionToken', res.body.sessionToken)
-            .send(res.body)
-            .then(response => {
-              expect(res).to.have.status(200);
-              expect(response.body.result.length).to.equal(3);
-              expect(response.body).have.property('count');
-              expect(response.body).have.property('pages');
-              done();
-            });
+          expect(res).to.have.status(500);
+          expect(res.body.message).to.equal('Invalid email!');
+          done();
         });
     });
   });
-  */
 });

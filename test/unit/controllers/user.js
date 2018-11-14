@@ -25,7 +25,6 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .then(res => {
         expect(res).to.have.status(201);
         expect(res.body.message).to.equal('Created user.');
-
         chai
           .request(server)
           .post(`/getUser/${res.body.user.id}`)

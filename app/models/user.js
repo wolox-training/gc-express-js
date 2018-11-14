@@ -27,33 +27,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        lowercase: true,
-        validate: {
-          isEmail: true,
-          notEmpty: true,
-          isWoloxDomain() {
-            if (
-              this.email.search(/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z]+\.)?(wolox)\.com$/g) !== 0
-            ) {
-              throw new Error('Domain of email is not valid.');
-            }
-          }
-        }
+        lowercase: true
       },
       password: {
         required: true,
         allowNull: false,
-        type: DataTypes.STRING,
-        validate: {
-          is: {
-            args: [/^[a-zA-Z0-9]*$/],
-            msg: 'Password require alphanumeric value.'
-          },
-          len: {
-            args: { min: 8, max: 50 },
-            msg: 'Password length is not in this range.'
-          }
-        }
+        type: DataTypes.STRING
       },
       createdAt: {
         allowNull: false,

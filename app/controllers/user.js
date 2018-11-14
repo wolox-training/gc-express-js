@@ -1,5 +1,6 @@
 const User = require('../models').User,
-  errors = require('../errors');
+  errors = require('../errors'),
+  jwt = require('../tools/jwtToken');
 
 exports.userPost = (req, res, next) => {
   const createUser = User.create({
@@ -22,6 +23,29 @@ exports.getUser = (req, res, next) => {
   return userFound
     .then(user => {
       res.status(200).send({ user, message: 'User found.' });
+    })
+    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
+};
+
+exports.generateToken = (req, res, next) => {
+  return User.findOne({ where: { email: req.body.email } })
+    .then(user => {
+      if (user.password === req.body.password) {
+        const token = jwt.createToken({ userId: user.id });
+        const userWithToken = {
+          email: user.email,
+          password: user.password,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          sessionToken: token,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        };
+
+        res.status(200).send(userWithToken);
+      } else {
+        next(errors.defaultError(`Invalid user`));
+      }
     })
     .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
 };

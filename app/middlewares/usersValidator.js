@@ -14,10 +14,7 @@ exports.handle = (req, res, next) => {
   const params = missingParams(req.body, 'email', 'password', 'firstName', 'lastName');
   if (!Array.isArray(params) || params.length) {
     next(errors.defaultError(`Missing parameters: ${params}`));
-  }
-
-  // Validate password
-  if (
+  } else if (
     !isValidPassword(req.body.password) ||
     (req.body.password.length < 8 || req.body.password.length > 50)
   ) {

@@ -26,12 +26,15 @@ describe('Controller: Users POST, `src/controller/user`', () => {
         expect(res).to.have.status(201);
         expect(res.body.message).to.equal('Created user.');
 
-        User.findById(res.body.user.id).then(response => {
-          expect(response.body.user.firstName).to.equal(userTest.firstName);
-          expect(response.body.user.lastName).to.equal(userTest.lastName);
-          expect(response.body.user.email).to.equal(userTest.email);
-        });
-        done();
+        chai
+          .request(server)
+          .post(`/getUser/${res.body.user.id}`)
+          .then(response => {
+            expect(response.body.user.firstName).to.equal(userTest.firstName);
+            expect(response.body.user.lastName).to.equal(userTest.lastName);
+            expect(response.body.user.email).to.equal(userTest.email);
+            done();
+          });
       });
   });
 
@@ -172,16 +175,18 @@ describe('Controller: Users GET, `src/controller/user`', () => {
     factory.create('user').then(user => {
       user.reload();
       userTest = user.dataValues;
-      done();
+      factory
+        .createMany('user', 5, [
+          { email: `${faker.internet.userName()}@wolox.com` },
+          { email: `${faker.internet.userName()}@wolox.com` },
+          { email: `${faker.internet.userName()}@wolox.com` },
+          { email: `${faker.internet.userName()}@wolox.com` },
+          { email: `${faker.internet.userName()}@wolox.com` }
+        ])
+        .then(() => {
+          done();
+        });
     });
-
-    factory.createMany('user', 5, [
-      { email: `${faker.internet.userName()}@wolox.com` },
-      { email: `${faker.internet.userName()}@wolox.com` },
-      { email: `${faker.internet.userName()}@wolox.com` },
-      { email: `${faker.internet.userName()}@wolox.com` },
-      { email: `${faker.internet.userName()}@wolox.com` }
-    ]);
   });
 
   context('When requesting with valid token and parameters', () => {
@@ -221,7 +226,7 @@ describe('Controller: Users GET, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with invalid parameters', () => {
+  context('When requesting with no parameters', () => {
     it('should return the first page of 3 users, using default values', done => {
       chai
         .request(server)
@@ -266,9 +271,32 @@ describe('Controller: Users GET, `src/controller/user`', () => {
         });
     });
   });
+
+  context('When requesting with valid parameters', () => {
+    it('should return the second page of 2 users', done => {
+      chai
+        .request(server)
+        .post('/users/sessions')
+        .send(userTest)
+        .then(res => {
+          chai
+            .request(server)
+            .get(request(2, 2))
+            .set('sessionToken', res.body.sessionToken)
+            .send(res.body)
+            .then(response => {
+              expect(res).to.have.status(200);
+              expect(response.body.result.length).to.equal(2);
+              expect(response.body).have.property('count');
+              expect(response.body).have.property('pages');
+              done();
+            });
+        });
+    });
+  });
 });
 
-describe.only('Controller: Users POST, `src/controller/user`', () => {
+describe('Controller: Users POST, `src/controller/user`', () => {
   let userTest = {};
   let userTest2 = {};
   const token = jwt.createToken({ userId: 1 });

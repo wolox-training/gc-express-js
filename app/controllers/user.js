@@ -1,6 +1,7 @@
 const User = require('../models').User,
   errors = require('../errors'),
-  jwt = require('../tools/jwtToken');
+  jwt = require('../tools/jwtToken'),
+  logger = require('../logger');
 
 exports.userPost = (req, res, next) => {
   const createUser = User.create({

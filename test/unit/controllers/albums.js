@@ -4,7 +4,8 @@ const _ = require('lodash'),
   expect = require('chai').expect,
   chaiHttp = require('chai-http'),
   server = require('../../../app'),
-  factory = require('factory-girl').factory;
+  factory = require('factory-girl').factory,
+  mocks = require('../support/mocks');
 
 chai.use(chaiHttp);
 
@@ -12,6 +13,7 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
 
   beforeEach(done => {
+    mocks.mockAlbums();
     factory.create('user').then(user => {
       user.reload();
       userTest = user.dataValues;
@@ -34,7 +36,7 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
             .send(res.body)
             .then(response => {
               expect(response).to.have.status(200);
-              expect(response.body.length).to.equal(100);
+              expect(response.body.length).to.equal(2);
               done();
             });
         });

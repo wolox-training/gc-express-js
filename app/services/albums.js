@@ -1,7 +1,7 @@
 const request = require('request-promise'),
   jsonplaceholder = 'https://jsonplaceholder.typicode.com/',
   User = require('../models').User,
-  Purchase = require('../models').Purchase;
+  Purchase = require('../models').purchase;
 
 exports.getAlbums = () =>
   request({
@@ -11,8 +11,9 @@ exports.getAlbums = () =>
   });
 
 exports.findOrBuy = (userId, albumId) => {
-  return Purchase.findAll({ where: { user_id: userId, album_id: albumId } })
+  return Purchase.findAll({ where: { album_id: albumId } })
     .then(purchases => {
+      console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
       if (purchases.length > 0) {
         throw new Error(`Album ${albumId} has already being bought by User ${userId}`);
       }

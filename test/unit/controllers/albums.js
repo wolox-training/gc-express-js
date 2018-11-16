@@ -5,7 +5,8 @@ const _ = require('lodash'),
   chaiHttp = require('chai-http'),
   server = require('../../../app'),
   factory = require('factory-girl').factory,
-  mocks = require('../support/mocks');
+  mocks = require('../support/mocks'),
+  jwt = require('../../../app/tools/jwtToken');
 
 chai.use(chaiHttp);
 
@@ -52,6 +53,38 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res.body.message).to.equal('Invalid token!');
+          done();
+        });
+    });
+  });
+});
+
+describe.only('Controller: Album POST, `src/controller/album`', () => {
+  let userTest = {};
+  const token = jwt.createToken({ userId: 1 });
+
+  beforeEach(done => {
+    mocks.mockAlbums();
+    factory.create('user').then(user => {
+      user.reload();
+      userTest = user.dataValues;
+      userTest.sessionToken = token;
+      done();
+    });
+  });
+
+  context('When requesting with a valid token', () => {
+    it('should return the albums', done => {
+      chai
+        .request(server)
+        .post('/albums/1')
+        .send(userTest)
+        .then(res => {
+          console.log(res.status);
+          /*
+          expect(res).to.have.status(201);
+          expect(res.body.length).to.equal(2);
+          */
           done();
         });
     });

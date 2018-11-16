@@ -1,17 +1,31 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const Purchase = sequelize.define(
-    'purchase',
-    {
-      albumId: { type: DataTypes.INTEGER, primaryKey: true, allowNull: false, field: 'album_id' }
+  const Purchase = sequelize.define('purchase', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
     },
-    {
-      underscored: true
+    albumId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    userId: {
+      type: DataTypes.INTEGER
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
     }
-  );
+  });
   Purchase.associate = function(models) {
-    Purchase.belongsTo(models.user);
+    Purchase.belongsTo(models.User);
   };
   return Purchase;
 };

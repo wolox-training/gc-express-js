@@ -12,7 +12,7 @@ const _ = require('lodash'),
 
 chai.use(chaiHttp);
 
-describe('Controller: Users POST, `src/controller/user`', () => {
+describe.only('Controller: Users POST, `src/controller/user`', () => {
   let userTest = {};
   beforeEach(() => {
     userTest = userFactory.default();

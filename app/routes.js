@@ -9,4 +9,5 @@ exports.init = app => {
   app.post('/getUser/:id', [], users.getUser);
   app.post('/users/sessions', [sessionParameterValidator.handle, emailValidator.handle], users.generateToken);
   app.get('/users', [tokenHeaderValidator.handle], users.list);
+  app.post('/admin/users', [emailValidator.handle, tokenHeaderValidator.handle], users.admin);
 };

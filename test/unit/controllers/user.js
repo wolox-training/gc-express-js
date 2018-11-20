@@ -7,9 +7,9 @@ const _ = require('lodash'),
   server = require('../../../app'),
   userFactory = require('../../factories/user'),
   faker = require('faker'),
-  factory = require('factory-girl').factory;
+  factory = require('factory-girl').factory,
+  jwt = require('../../../app/tools/jwtToken');
 
-const should = chai.should();
 chai.use(chaiHttp);
 
 describe('Controller: Users POST, `src/controller/user`', () => {
@@ -122,7 +122,7 @@ describe('Controller: Users/sessions POST', () => {
   });
 
   context('When requesting with a valid token', () => {
-    it.only('should return the user', done => {
+    it('should return the user', done => {
       chai
         .request(server)
         .post('/users/sessions')
@@ -290,6 +290,97 @@ describe('Controller: Users GET, `src/controller/user`', () => {
               expect(response.body).have.property('pages');
               done();
             });
+        });
+    });
+  });
+});
+
+describe('Controller: Users POST, `src/controller/user`', () => {
+  let userTest = {};
+  let userTest2 = {};
+  const token = jwt.createToken({ userId: 1 });
+
+  factory.define('userNotAdmin', User, {
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    email: `${faker.internet.userName()}@wolox.com`,
+    password: faker.random.alphaNumeric(8, 50),
+    admin: false
+  });
+
+  beforeEach(done => {
+    factory.create('userNotAdmin').then(user => {
+      userTest = user.dataValues;
+      userTest.sessionToken = token;
+      factory.buildMany('user', 1, [{ email: `${faker.internet.userName()}@wolox.com` }]).then(userBuild => {
+        userTest2 = userBuild[0].dataValues;
+        userTest2.sessionToken = token;
+        done();
+      });
+    });
+  });
+
+  context('When requesting with valid token and parameters', () => {
+    it('should update no admin user to admin user', done => {
+      chai
+        .request(server)
+        .post('/admin/users')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.admin).to.equal(true);
+          done();
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    });
+  });
+
+  context('When requesting with valid token and parameters', () => {
+    it('should return new admin user', done => {
+      chai
+        .request(server)
+        .post('/admin/users')
+        .send(userTest2)
+        .then(res => {
+          expect(res).to.have.status(201);
+          expect(res.body.admin).to.equal(true);
+          expect(res.body).have.property('firstName');
+          expect(res.body).have.property('lastName');
+          expect(res.body).have.property('password');
+          expect(res.body).have.property('email');
+          done();
+        });
+    });
+  });
+
+  context('When requesting with invalid token', () => {
+    it('shoul return invalid token message', done => {
+      userTest.sessionToken = 'invalid';
+      chai
+        .request(server)
+        .post('/admin/users')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res.body.message).to.equal('Invalid token!');
+          done();
+        });
+    });
+  });
+
+  context('When requesting with invalid email', () => {
+    it('shoul return invalid email message', done => {
+      userTest.email = `${faker.internet.userName()}@not_wolox.com`;
+      chai
+        .request(server)
+        .post('/admin/users')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res.body.message).to.equal('Invalid email!');
+          done();
         });
     });
   });

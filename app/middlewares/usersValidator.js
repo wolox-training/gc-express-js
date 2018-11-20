@@ -1,4 +1,5 @@
-const errors = require('../errors');
+const errors = require('../errors'),
+  bcrypt = require('bcryptjs');
 
 const missingParams = (data, ...params) => {
   return params.filter(p => !data[p]);

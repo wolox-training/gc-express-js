@@ -3,7 +3,7 @@ const errors = require('../errors'),
   JWT_KEY = require('../constants').jwt_key;
 
 exports.handle = (req, res, next) => {
-  jwt.verify(`${req.body.sessionToken}`, JWT_KEY, (jwtError, decoded) => {
+  jwt.verify(`${req.body.sessionToken}`, JWT_KEY, jwtError => {
     if (jwtError) {
       next(errors.defaultError('Invalid token!'));
     }

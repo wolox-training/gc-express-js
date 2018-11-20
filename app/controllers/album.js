@@ -18,7 +18,6 @@ exports.buy = (req, res, next) => {
   albumsService
     .findOrBuy(req.body.userId, req.params.id)
     .then(purchase => {
-      console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
       logger.info('Albums purchased.');
       res.status(201).json(purchase);
     })

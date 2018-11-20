@@ -80,7 +80,6 @@ describe.only('Controller: Album POST, `src/controller/album`', () => {
         .post('/albums/1')
         .send(userTest)
         .then(res => {
-          console.log(res.status);
           /*
           expect(res).to.have.status(201);
           expect(res.body.length).to.equal(2);

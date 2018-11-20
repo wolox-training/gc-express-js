@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
   Purchase.associate = function(models) {
-    Purchase.belongsTo(models.User);
+    Purchase.belongsTo(models.User, { foreignKey: 'userId', targetKey: 'id' });
   };
   return Purchase;
 };

@@ -14,9 +14,13 @@ exports.userPost = (req, res, next) => {
 
   return createUser
     .then(user => {
+      logger.info(`Created user ${user.firstName} ${user.lastName}.`);
       res.status(201).send({ user, message: 'Created user.' });
     })
-    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
+    .catch(reason => {
+      logger.error(`Database error - ${reason}`);
+      next(errors.defaultError(`Database error - ${reason}`));
+    });
 };
 
 exports.getUser = (req, res, next) => {
@@ -24,9 +28,13 @@ exports.getUser = (req, res, next) => {
 
   return userFound
     .then(user => {
+      logger.info(`User ${user.firstName} ${user.lastName} found.`);
       res.status(200).send({ user, message: 'User found.' });
     })
-    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
+    .catch(reason => {
+      logger.error(`Database error - ${reason}`);
+      next(errors.defaultError(`Database error - ${reason}`));
+    });
 };
 
 exports.generateToken = (req, res, next) => {
@@ -46,12 +54,17 @@ exports.generateToken = (req, res, next) => {
           updatedAt: user.updatedAt
         };
 
+        logger.info(`User ${user.firstName} ${user.lastName} authenticated.`);
         res.status(200).send(userWithToken);
       } else {
+        logger.error('Invalid user.');
         next(errors.defaultError(`Invalid user`));
       }
     })
-    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
+    .catch(reason => {
+      logger.error(`Database error - ${reason}`);
+      next(errors.defaultError(`Database error - ${reason}`));
+    });
 };
 
 exports.list = (req, res, next) => {
@@ -66,10 +79,12 @@ exports.list = (req, res, next) => {
         offset,
         order: [['id', 'ASC']]
       }).then(users => {
+        logger.info('List of users');
         res.status(200).json({ result: users, count: data.count, pages });
       });
     })
     .catch(error => {
+      logger.error(`Database error - ${error}`);
       next(errors.defaultError(`Database error - ${error}`));
     });
 };
@@ -87,15 +102,21 @@ exports.admin = (req, res, next) => {
     .spread((user, created) => {
       if (created) {
         user.update({ admin: true }).then(() => {
+          logger.info(`Admin ${user.firstName} ${user.lastName} created.`);
           res.status(201).send(user);
         });
       } else if (user.admin === false) {
         user.update({ admin: true }).then(() => {
+          logger.info(`User ${user.firstName} ${user.lastName} updated to admin.`);
           res.status(200).send(user);
         });
       } else {
-        next(errors.defaultError(`Invalid user2`));
+        logger.error(`Invalid user`);
+        next(errors.defaultError(`Invalid user`));
       }
     })
-    .catch(reason => next(errors.defaultError(`Database error - ${reason}`)));
+    .catch(reason => {
+      logger.error(`Database error - ${reason}`);
+      next(errors.defaultError(`Database error - ${reason}`));
+    });
 };

@@ -12,12 +12,14 @@ chai.use(chaiHttp);
 
 describe.only('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
+  const token = jwt.createToken({ userId: 1 });
 
   beforeEach(done => {
     mocks.mockAlbums();
     factory.create('user').then(user => {
       user.reload();
       userTest = user.dataValues;
+      userTest.sessionToken = token;
       done();
     });
   });
@@ -26,26 +28,19 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
     it('should return the albums', done => {
       chai
         .request(server)
-        .post('/users/sessions')
+        .get('/albums')
         .send(userTest)
-        .then(res => {
-          expect(res).to.have.status(200);
-          expect(res.body).have.property('sessionToken');
-          chai
-            .request(server)
-            .get('/albums')
-            .send(res.body)
-            .then(response => {
-              expect(response).to.have.status(200);
-              expect(response.body.length).to.equal(2);
-              done();
-            });
+        .then(response => {
+          expect(response).to.have.status(200);
+          expect(response.body.length).to.equal(2);
+          done();
         });
     });
   });
 
   context('When requesting with an invalid token', () => {
     it('should return invalid token message', done => {
+      userTest.sessionToken = 'invalid token';
       chai
         .request(server)
         .get('/albums')

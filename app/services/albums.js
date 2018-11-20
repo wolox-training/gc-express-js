@@ -11,17 +11,10 @@ exports.getAlbums = () =>
   });
 
 exports.findOrBuy = (userId, albumId) => {
-  return Purchase.findAll({ where: { user_id: userId, album_id: albumId } })
-    .then(purchases => {
-      if (purchases.length > 0) {
-        throw new Error(`Album ${albumId} has already being bought by User ${userId}`);
-      }
-      return Purchase.create({ userId, albumId });
-    })
-    .then(purchase => {
-      return User.findById(userId)
-        .then(user => user.addPurchases([purchase]))
-        .then(() => purchase);
-    })
-    .then(purchase => purchase.reload());
+  return Purchase.findAll({ where: { userId, albumId } }).then(purchases => {
+    if (purchases.length > 0) {
+      throw new Error(`Album ${albumId} was already purchased by user ${userId}`);
+    }
+    return Purchase.create({ userId, albumId });
+  });
 };

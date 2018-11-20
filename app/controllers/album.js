@@ -16,9 +16,9 @@ exports.list = (req, res, next) =>
 
 exports.buy = (req, res, next) => {
   albumsService
-    .findOrBuy(req.body.userId, req.params.id)
+    .findOrBuy(req.body.id, req.params.id)
     .then(purchase => {
-      logger.info('Albums purchased.');
+      logger.info(`Album ${purchase.dataValues.albumId} purchased.`);
       res.status(201).json(purchase);
     })
     .catch(error => {

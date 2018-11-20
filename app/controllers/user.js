@@ -14,7 +14,7 @@ exports.userPost = (req, res, next) => {
 
   return createUser
     .then(user => {
-      logger.info('Created user.');
+      logger.info(`Created user ${user.firstName} ${user.lastName}.`);
       res.status(201).send({ user, message: 'Created user.' });
     })
     .catch(reason => {
@@ -28,7 +28,7 @@ exports.getUser = (req, res, next) => {
 
   return userFound
     .then(user => {
-      logger.info('User found.');
+      logger.info(`User ${user.firstName} ${user.lastName} found.`);
       res.status(200).send({ user, message: 'User found.' });
     })
     .catch(reason => {
@@ -54,10 +54,10 @@ exports.generateToken = (req, res, next) => {
           updatedAt: user.updatedAt
         };
 
-        logger.info('User authenticated.');
+        logger.info(`User ${user.firstName} ${user.lastName} authenticated.`);
         res.status(200).send(userWithToken);
       } else {
-        logger.info('Invalid user.');
+        logger.error('Invalid user.');
         next(errors.defaultError(`Invalid user`));
       }
     })
@@ -102,12 +102,12 @@ exports.admin = (req, res, next) => {
     .spread((user, created) => {
       if (created) {
         user.update({ admin: true }).then(() => {
-          logger.info('Admin created.');
+          logger.info(`Admin ${user.firstName} ${user.lastName} created.`);
           res.status(201).send(user);
         });
       } else if (user.admin === false) {
         user.update({ admin: true }).then(() => {
-          logger.info('User updated to admin.');
+          logger.info(`User ${user.firstName} ${user.lastName} updated to admin.`);
           res.status(200).send(user);
         });
       } else {

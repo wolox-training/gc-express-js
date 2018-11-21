@@ -13,3 +13,16 @@ exports.list = (req, res, next) =>
       logger.error(`Error - ${error}`);
       next(errors.defaultError(`Error - ${error}`));
     });
+
+exports.buy = (req, res, next) => {
+  albumsService
+    .findOrBuy(req.body.id, req.params.id)
+    .then(purchase => {
+      logger.info(`Album ${purchase.dataValues.albumId} purchased.`);
+      res.status(201).json(purchase);
+    })
+    .catch(error => {
+      logger.error(`Error processing the purchase - ${error}`);
+      next(errors.defaultError(`Error processing the purchase - ${error}`));
+    });
+};

@@ -12,4 +12,5 @@ exports.init = app => {
   app.get('/users', [tokenHeaderValidator.handle], users.list);
   app.post('/admin/users', [emailValidator.handle, tokenHeaderValidator.handle], users.admin);
   app.get('/albums', [tokenHeaderValidator.handle], albums.list);
+  app.post('/albums/:id', [tokenHeaderValidator.handle], albums.buy);
 };

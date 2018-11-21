@@ -1,6 +1,5 @@
 const request = require('request-promise'),
   jsonplaceholder = 'https://jsonplaceholder.typicode.com/',
-  User = require('../models').User,
   Purchase = require('../models').purchase;
 
 exports.getAlbums = () =>
@@ -16,5 +15,22 @@ exports.findOrBuy = (userId, albumId) => {
       throw new Error(`Album ${albumId} was already purchased by user ${userId}`);
     }
     return Purchase.create({ userId, albumId });
+  });
+};
+
+exports.findAll = userId => {
+  let promise;
+
+  if (userId === undefined) {
+    promise = Purchase.findAll();
+  } else {
+    promise = Purchase.findAll({ where: { userId } });
+  }
+
+  return promise.then(purchases => {
+    if (purchases.length === 0) {
+      throw new Error(`The user ${userId} does not have purchased albums`);
+    }
+    return purchases;
   });
 };

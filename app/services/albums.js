@@ -19,15 +19,7 @@ exports.findOrBuy = (userId, albumId) => {
 };
 
 exports.findAll = userId => {
-  let promise;
-
-  if (userId === undefined) {
-    promise = Purchase.findAll();
-  } else {
-    promise = Purchase.findAll({ where: { userId } });
-  }
-
-  return promise.then(purchases => {
+  return Purchase.findAll({ where: { userId } }).then(purchases => {
     if (purchases.length === 0) {
       throw new Error(`The user ${userId} does not have purchased albums`);
     }

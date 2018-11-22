@@ -26,3 +26,19 @@ exports.findAll = userId => {
     return purchases;
   });
 };
+
+exports.getPhotosforPurchasedAlbum = (userId, albumId) => {
+  return Purchase.findOne({ where: { userId, albumId } })
+    .then(purchase => {
+      if (!purchase) throw new Error('Album not purchased');
+      return purchase.albumId;
+    })
+    .then(() => {
+      request({
+        method: 'GET',
+        uri: `/albums/${albumId}/photos`,
+        json: true
+      });
+    })
+    .then(photos => photos.map(photo => photo.url));
+};

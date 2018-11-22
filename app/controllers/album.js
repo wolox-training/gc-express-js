@@ -1,6 +1,5 @@
 const errors = require('../errors'),
   albumsService = require('../services/albums'),
-  User = require('../models').User,
   logger = require('../logger');
 
 exports.list = (req, res, next) =>

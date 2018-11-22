@@ -3,13 +3,14 @@ const errors = require('../errors'),
   logger = require('../logger');
 
 exports.list = (req, res, next) => {
-  if (req.body.admin === false && req.body.id !== req.params.user_id) {
-    logger.error(`User ${req.body.id} does not have access to another user photos.`);
-    next(errors.defaultError(`User ${req.body.id} does not have access to another user photos.`));
-  } else {
-    albumsService
-      .getPhotosforPurchasedAlbum(req.body.userId, req.params.id)
-      .then(data => res.status(200).json(data))
-      .catch(error => next(errors.defaultError(`Database error - ${error}`)));
-  }
+  albumsService
+    .getPhotosforPurchasedAlbum(req.body.id, req.params.id)
+    .then(data => {
+      logger.info(`Photos found!`);
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      logger.error(`Database error - ${error}`);
+      next(errors.defaultError(`Database error - ${error}`));
+    });
 };

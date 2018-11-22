@@ -20,9 +20,6 @@ exports.findOrBuy = (userId, albumId) => {
 
 exports.findAll = userId => {
   return Purchase.findAll({ where: { userId } }).then(purchases => {
-    if (purchases.length === 0) {
-      throw new Error(`The user ${userId} does not have purchased albums`);
-    }
     return purchases;
   });
 };
@@ -34,11 +31,13 @@ exports.getPhotosforPurchasedAlbum = (userId, albumId) => {
       return purchase.albumId;
     })
     .then(() => {
-      request({
+      return request({
         method: 'GET',
-        uri: `/albums/${albumId}/photos`,
+        uri: `${jsonplaceholder}albums/${albumId}/photos`,
         json: true
       });
     })
-    .then(photos => photos.map(photo => photo.url));
+    .then(photos => {
+      return photos;
+    });
 };

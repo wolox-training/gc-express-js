@@ -20,9 +20,6 @@ exports.findOrBuy = (userId, albumId) => {
 
 exports.findAll = userId => {
   return Purchase.findAll({ where: { userId } }).then(purchases => {
-    if (purchases.length === 0) {
-      throw new Error(`The user ${userId} does not have purchased albums`);
-    }
     return purchases;
   });
 };

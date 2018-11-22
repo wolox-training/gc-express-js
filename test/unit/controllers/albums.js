@@ -7,6 +7,7 @@ const _ = require('lodash'),
   factory = require('factory-girl').factory,
   faker = require('faker'),
   mocks = require('../support/mocks'),
+  Purchase = require('../../../app/models').purchase,
   jwt = require('../../../app/tools/jwtToken');
 
 chai.use(chaiHttp);
@@ -149,6 +150,11 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
   const token = jwt.createToken({ userId: 1 });
   const tokenBuy = jwt.createToken({ userId: 2 });
 
+  factory.define('purchase', Purchase, {
+    albumId: 1,
+    userId: 2
+  });
+
   beforeEach(done => {
     mocks.mockAlbums();
     factory.create('user').then(user => {
@@ -161,7 +167,10 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
         user2.reload();
         userBuy = user2.dataValues;
         userBuy.sessionToken = tokenBuy;
-        done();
+
+        factory.createMany('purchase', 2, [{ albumId: 1 }, { albumId: 2 }]).then(() => {
+          done();
+        });
       });
     });
   });
@@ -170,53 +179,29 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
     it('should list albums user 2', done => {
       chai
         .request(server)
-        .post('/albums/1')
-        .send(userBuy)
-        .then(() => {
-          chai
-            .request(server)
-            .post('/albums/2')
-            .send(userBuy)
-            .then(() => {
-              chai
-                .request(server)
-                .get('/users/2/albums')
-                .send(userTest)
-                .then(res => {
-                  expect(res).to.have.status(200);
-                  expect(res.body.length).to.equal(2);
-                  expect(res.body[0]).have.property('albumId');
-                  expect(res.body[1]).have.property('albumId');
-                  done();
-                });
-            });
+        .get('/users/2/albums')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.length).to.equal(2);
+          expect(res.body[0]).have.property('albumId');
+          expect(res.body[1]).have.property('albumId');
+          done();
         });
     });
   });
 
   context('When requesting albums with not admin', () => {
     it('should return error message', done => {
+      userTest.admin = false;
       chai
         .request(server)
-        .post('/albums/1')
-        .send(userBuy)
-        .then(() => {
-          chai
-            .request(server)
-            .post('/albums/2')
-            .send(userBuy)
-            .then(() => {
-              userTest.admin = false;
-              chai
-                .request(server)
-                .get('/users/2/albums')
-                .send(userTest)
-                .then(res => {
-                  expect(res).to.have.status(500);
-                  expect(res.body.message).to.equal('User 1 does not have access to another user purchases.');
-                  done();
-                });
-            });
+        .get('/users/2/albums')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res.body.message).to.equal('User 1 does not have access to another user purchases.');
+          done();
         });
     });
   });
@@ -225,26 +210,14 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
     it('should return owns albums', done => {
       chai
         .request(server)
-        .post('/albums/1')
+        .get('/users/2/albums')
         .send(userBuy)
-        .then(() => {
-          chai
-            .request(server)
-            .post('/albums/2')
-            .send(userBuy)
-            .then(() => {
-              chai
-                .request(server)
-                .get('/users/2/albums')
-                .send(userBuy)
-                .then(res => {
-                  expect(res).to.have.status(200);
-                  expect(res.body.length).to.equal(2);
-                  expect(res.body[0]).have.property('albumId');
-                  expect(res.body[1]).have.property('albumId');
-                  done();
-                });
-            });
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.length).to.equal(2);
+          expect(res.body[0]).have.property('albumId');
+          expect(res.body[1]).have.property('albumId');
+          done();
         });
     });
   });

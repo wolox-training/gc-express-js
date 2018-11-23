@@ -4,8 +4,10 @@ const errors = require('../errors'),
 
 exports.handle = (req, res, next) => {
   jwt.verify(`${req.body.sessionToken}`, JWT_KEY, jwtError => {
-    if (jwtError) {
+    if (jwtError && jwtError.message === 'jwt malformed') {
       next(errors.defaultError('Invalid token!'));
+    } else if (jwtError) {
+      next(errors.defaultError('Token expired!'));
     }
   });
 

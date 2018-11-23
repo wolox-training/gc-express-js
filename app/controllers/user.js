@@ -1,7 +1,8 @@
 const User = require('../models').User,
   errors = require('../errors'),
   jwt = require('../tools/jwtToken'),
-  logger = require('../logger');
+  logger = require('../logger'),
+  expirationTime = require('../constants').expirationTime;
 
 exports.userPost = (req, res, next) => {
   const createUser = User.create({
@@ -41,7 +42,7 @@ exports.generateToken = (req, res, next) => {
   return User.findOne({ where: { email: req.body.email } })
     .then(user => {
       if (user.password === req.body.password) {
-        const token = jwt.createToken({ userId: user.id });
+        const token = jwt.createToken({ userId: user.id, expiresIn: expirationTime });
         const userWithToken = {
           id: user.id,
           email: user.email,
@@ -54,7 +55,9 @@ exports.generateToken = (req, res, next) => {
           updatedAt: user.updatedAt
         };
 
-        logger.info(`User ${user.firstName} ${user.lastName} authenticated.`);
+        logger.info(
+          `User ${user.firstName} ${user.lastName} authenticated. Expiration time: ${expirationTime}.`
+        );
         res.status(200).send(userWithToken);
       } else {
         logger.error('Invalid user.');

@@ -11,7 +11,7 @@ const _ = require('lodash'),
 
 chai.use(chaiHttp);
 
-describe.only('Controller: Album GET, `src/controller/album`', () => {
+describe('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
   let userBuy = {};
   const token = jwt.createToken({ userId: 1 });

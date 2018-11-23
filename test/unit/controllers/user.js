@@ -8,7 +8,8 @@ const _ = require('lodash'),
   userFactory = require('../../factories/user'),
   faker = require('faker'),
   factory = require('factory-girl').factory,
-  jwt = require('../../../app/tools/jwtToken');
+  jwt = require('../../../app/tools/jwtToken'),
+  expirationTime = require('../../../app/constants').expirationTime;
 
 chai.use(chaiHttp);
 
@@ -380,6 +381,57 @@ describe('Controller: Users POST, `src/controller/user`', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res.body.message).to.equal('Invalid email!');
+          done();
+        });
+    });
+  });
+});
+
+describe.only('Controller: Users POST, `src/controller/user`', () => {
+  let userTest = {};
+  const token = jwt.createToken({ userId: 1, expiresIn: expirationTime });
+  const expiredToken = jwt.createToken({ userId: 1, expiresIn: '2h' });
+  const request = (limit, page) => `/users?limit=${limit}&page=${page}`;
+
+  beforeEach(done => {
+    factory.create('user').then(user => {
+      userTest = user.dataValues;
+      userTest.sessionToken = token;
+      done();
+    });
+  });
+
+  context('When requesting with valid token and parameters', () => {
+    it('should return users list', done => {
+      chai
+        .request(server)
+        .get(request(2, 1))
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.result.length).to.equal(1);
+          expect(res.body).have.property('count');
+          expect(res.body).have.property('pages');
+          done();
+        });
+    });
+  });
+
+  context('When requesting with expired token', () => {
+    it('should return expired token message', done => {
+      userTest.sessionToken = expiredToken;
+      chai
+        .request(server)
+        .get(request(2, 1))
+        .send(userTest)
+        .then(res => {
+          console.log(res.body);
+          /*
+          expect(res).to.have.status(200);
+          expect(res.body.result.length).to.equal(1);
+          expect(res.body).have.property('count');
+          expect(res.body).have.property('pages');
+          */
           done();
         });
     });

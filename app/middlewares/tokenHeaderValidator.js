@@ -6,8 +6,8 @@ exports.handle = (req, res, next) => {
   jwt.verify(`${req.body.sessionToken}`, JWT_KEY, jwtError => {
     if (jwtError && jwtError.message === 'jwt malformed') {
       next(errors.defaultError('Invalid token!'));
-    } else if (jwtError) {
-      next(errors.defaultError('Token expired!'));
+    } else if (jwtError && jwtError.message === 'jwt expired') {
+      next(errors.defaultError('Expired token!'));
     }
   });
 

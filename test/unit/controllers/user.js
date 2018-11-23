@@ -9,7 +9,8 @@ const _ = require('lodash'),
   faker = require('faker'),
   factory = require('factory-girl').factory,
   jwt = require('../../../app/tools/jwtToken'),
-  expirationTime = require('../../../app/constants').expirationTime;
+  expirationTime = require('../../../app/constants').expirationTime,
+  moment = require('moment');
 
 chai.use(chaiHttp);
 
@@ -390,7 +391,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
 describe.only('Controller: Users POST, `src/controller/user`', () => {
   let userTest = {};
   const token = jwt.createToken({ userId: 1, expiresIn: expirationTime });
-  const expiredToken = jwt.createToken({ userId: 1, expiresIn: '2h' });
+  const expiredToken = jwt.createToken({ userId: 1, expiresIn: '1s' });
   const request = (limit, page) => `/users?limit=${limit}&page=${page}`;
 
   beforeEach(done => {
@@ -420,20 +421,22 @@ describe.only('Controller: Users POST, `src/controller/user`', () => {
   context('When requesting with expired token', () => {
     it('should return expired token message', done => {
       userTest.sessionToken = expiredToken;
-      chai
-        .request(server)
-        .get(request(2, 1))
-        .send(userTest)
-        .then(res => {
-          console.log(res.body);
-          /*
-          expect(res).to.have.status(200);
-          expect(res.body.result.length).to.equal(1);
-          expect(res.body).have.property('count');
-          expect(res.body).have.property('pages');
-          */
-          done();
-        });
+      setTimeout(() => {
+        chai
+          .request(server)
+          .get(request(2, 1))
+          .send(userTest)
+          .then(res => {
+            // console.log(res.body);
+            /*
+            expect(res).to.have.status(200);
+            expect(res.body.result.length).to.equal(1);
+            expect(res.body).have.property('count');
+            expect(res.body).have.property('pages');
+            */
+            done();
+          });
+      }, 2000);
     });
   });
 });

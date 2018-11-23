@@ -11,7 +11,7 @@ const _ = require('lodash'),
 
 chai.use(chaiHttp);
 
-describe.only('Controller: Album GET, `src/controller/album`', () => {
+describe('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
   let userBuy = {};
   const token = jwt.createToken({ userId: 1 });
@@ -84,7 +84,7 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
         .send(userTest)
         .then(res => {
           expect(res).to.have.status(500);
-          expect(res.body.message).to.equal('Database error - Error: Album not purchased');
+          expect(res.body.message).to.equal('Photos not found - Error: Album not purchased');
           done();
         });
     });

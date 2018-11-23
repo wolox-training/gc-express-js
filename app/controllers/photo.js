@@ -10,7 +10,7 @@ exports.list = (req, res, next) => {
       res.status(200).json(data);
     })
     .catch(error => {
-      logger.error(`Database error - ${error}`);
-      next(errors.defaultError(`Database error - ${error}`));
+      logger.error(`Photos not found - ${error}`);
+      next(errors.defaultError(`Photos not found - ${error}`));
     });
 };

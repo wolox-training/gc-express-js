@@ -2,7 +2,8 @@ const User = require('../models').User,
   errors = require('../errors'),
   jwt = require('../tools/jwtToken'),
   logger = require('../logger'),
-  expirationTime = require('../constants').expirationTime;
+  expirationTime = process.env.SESSION_EXP,
+  moment = require('moment');
 
 exports.userPost = (req, res, next) => {
   const createUser = User.create({
@@ -42,7 +43,12 @@ exports.generateToken = (req, res, next) => {
   return User.findOne({ where: { email: req.body.email } })
     .then(user => {
       if (user.password === req.body.password) {
-        const token = jwt.createToken({ userId: user.id, expiresIn: expirationTime });
+        const token = jwt.createToken({
+          userId: user.id,
+          expiresIn: moment()
+            .add(expirationTime, 'second')
+            .valueOf()
+        });
         const userWithToken = {
           id: user.id,
           email: user.email,

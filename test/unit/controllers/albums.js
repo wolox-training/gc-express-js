@@ -8,13 +8,20 @@ const _ = require('lodash'),
   faker = require('faker'),
   mocks = require('../support/mocks'),
   Purchase = require('../../../app/models').purchase,
-  jwt = require('../../../app/tools/jwtToken');
+  jwt = require('../../../app/tools/jwtToken'),
+  moment = require('moment'),
+  expirationTime = process.env.SESSION_EXP;
 
 chai.use(chaiHttp);
 
 describe('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
-  const token = jwt.createToken({ userId: 1 });
+  const token = jwt.createToken({
+    userId: 1,
+    expiresIn: moment()
+      .add(expirationTime, 'second')
+      .valueOf()
+  });
 
   beforeEach(done => {
     mocks.mockAlbums();
@@ -58,7 +65,12 @@ describe('Controller: Album GET, `src/controller/album`', () => {
 
 describe('Controller: Album POST, `src/controller/album`', () => {
   let userTest = {};
-  const token = jwt.createToken({ userId: 1 });
+  const token = jwt.createToken({
+    userId: 1,
+    expiresIn: moment()
+      .add(expirationTime, 'second')
+      .valueOf()
+  });
 
   beforeEach(done => {
     mocks.mockAlbums();
@@ -147,8 +159,18 @@ describe('Controller: Album POST, `src/controller/album`', () => {
 describe('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
   let userBuy = {};
-  const token = jwt.createToken({ userId: 1 });
-  const tokenBuy = jwt.createToken({ userId: 2 });
+  const token = jwt.createToken({
+    userId: 1,
+    expiresIn: moment()
+      .add(expirationTime, 'millisecond')
+      .valueOf()
+  });
+  const tokenBuy = jwt.createToken({
+    userId: 2,
+    expiresIn: moment()
+      .add(expirationTime, 'millisecond')
+      .valueOf()
+  });
 
   factory.define('purchase', Purchase, {
     albumId: 1,

@@ -451,7 +451,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
   });
 });
 
-describe.only('Controller: Users POST, `src/controller/user`', () => {
+describe('Controller: Users POST, `src/controller/user`', () => {
   let userTest = {};
   const token = jwt.createToken({
     userId: 1,

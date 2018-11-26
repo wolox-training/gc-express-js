@@ -109,8 +109,7 @@ exports.admin = (req, res, next) => {
       lastName: req.body.lastName,
       password: req.body.password,
       email: req.body.email,
-      admin: false,
-      isActive: false
+      admin: false
     }
   })
     .spread((user, created) => {

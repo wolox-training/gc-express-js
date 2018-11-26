@@ -5,12 +5,14 @@ const _ = require('lodash'),
   chaiHttp = require('chai-http'),
   server = require('../../../app'),
   factory = require('factory-girl').factory,
+  faker = require('faker'),
   mocks = require('../support/mocks'),
+  Purchase = require('../../../app/models').purchase,
   jwt = require('../../../app/tools/jwtToken');
 
 chai.use(chaiHttp);
 
-describe.only('Controller: Album GET, `src/controller/album`', () => {
+describe('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
   const token = jwt.createToken({ userId: 1 });
 
@@ -54,7 +56,7 @@ describe.only('Controller: Album GET, `src/controller/album`', () => {
   });
 });
 
-describe.only('Controller: Album POST, `src/controller/album`', () => {
+describe('Controller: Album POST, `src/controller/album`', () => {
   let userTest = {};
   const token = jwt.createToken({ userId: 1 });
 
@@ -136,6 +138,85 @@ describe.only('Controller: Album POST, `src/controller/album`', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res.body.message).to.equal('Invalid token!');
+          done();
+        });
+    });
+  });
+});
+
+describe('Controller: Album GET, `src/controller/album`', () => {
+  let userTest = {};
+  let userBuy = {};
+  const token = jwt.createToken({ userId: 1 });
+  const tokenBuy = jwt.createToken({ userId: 2 });
+
+  factory.define('purchase', Purchase, {
+    albumId: 1,
+    userId: 2
+  });
+
+  beforeEach(done => {
+    mocks.mockAlbums();
+    factory.create('user').then(user => {
+      user.reload();
+      userTest = user.dataValues;
+      userTest.sessionToken = token;
+      userTest.admin = true;
+
+      factory.create('user', { email: `${faker.internet.userName()}@wolox.com` }).then(user2 => {
+        user2.reload();
+        userBuy = user2.dataValues;
+        userBuy.sessionToken = tokenBuy;
+
+        factory.createMany('purchase', 2, [{ albumId: 1 }, { albumId: 2 }]).then(() => {
+          done();
+        });
+      });
+    });
+  });
+
+  context('When requesting albums with admin', () => {
+    it('should list albums user 2', done => {
+      chai
+        .request(server)
+        .get('/users/2/albums')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.length).to.equal(2);
+          expect(res.body[0]).have.property('albumId');
+          expect(res.body[1]).have.property('albumId');
+          done();
+        });
+    });
+  });
+
+  context('When requesting albums with not admin', () => {
+    it('should return error message', done => {
+      userTest.admin = false;
+      chai
+        .request(server)
+        .get('/users/2/albums')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res.body.message).to.equal('User 1 does not have access to another user purchases.');
+          done();
+        });
+    });
+  });
+
+  context('When requesting owns albums', () => {
+    it('should return owns albums', done => {
+      chai
+        .request(server)
+        .get('/users/2/albums')
+        .send(userBuy)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.length).to.equal(2);
+          expect(res.body[0]).have.property('albumId');
+          expect(res.body[1]).have.property('albumId');
           done();
         });
     });

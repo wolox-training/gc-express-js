@@ -450,3 +450,45 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 });
+
+describe.only('Controller: Users POST, `src/controller/user`', () => {
+  let userTest = {};
+  const token = jwt.createToken({
+    userId: 1,
+    expiresIn: moment()
+      .add(expirationTime, 'seconds')
+      .valueOf()
+  });
+
+  beforeEach(done => {
+    factory.create('user').then(user => {
+      userTest = user.dataValues;
+      userTest.sessionToken = token;
+      factory
+        .createMany('user', 5, [
+          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
+          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
+          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
+          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
+          { email: `${faker.internet.userName()}@wolox.com`, isActive: true }
+        ])
+        .then(() => {
+          done();
+        });
+    });
+  });
+
+  context('When requesting to invalidate all users', () => {
+    it('should invalidate all users ', done => {
+      chai
+        .request(server)
+        .post('/users/sessions/invalidate_all')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.message).to.equal('All users invaliudated.');
+          done();
+        });
+    });
+  });
+});

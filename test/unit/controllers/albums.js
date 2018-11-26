@@ -162,13 +162,13 @@ describe('Controller: Album GET, `src/controller/album`', () => {
   const token = jwt.createToken({
     userId: 1,
     expiresIn: moment()
-      .add(expirationTime, 'millisecond')
+      .add(expirationTime, 'second')
       .valueOf()
   });
   const tokenBuy = jwt.createToken({
     userId: 2,
     expiresIn: moment()
-      .add(expirationTime, 'millisecond')
+      .add(expirationTime, 'second')
       .valueOf()
   });
 

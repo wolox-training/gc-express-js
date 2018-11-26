@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
         required: true,
         type: DataTypes.BOOLEAN
       },
+      isActive: {
+        required: true,
+        type: DataTypes.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

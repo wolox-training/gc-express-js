@@ -11,7 +11,8 @@ exports.userPost = (req, res, next) => {
     lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password,
-    admin: req.body.admin
+    admin: req.body.admin,
+    isActive: false
   });
 
   return createUser
@@ -57,14 +58,17 @@ exports.generateToken = (req, res, next) => {
           lastName: user.lastName,
           sessionToken: token,
           admin: user.admin,
+          isActive: true,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
         };
 
-        logger.info(
-          `User ${user.firstName} ${user.lastName} authenticated. Expiration time: ${expirationTime}.`
-        );
-        res.status(200).send(userWithToken);
+        user.update({ isActive: true }).then(() => {
+          logger.info(
+            `User ${user.firstName} ${user.lastName} authenticated. Expiration time: ${expirationTime}.`
+          );
+          res.status(200).send(userWithToken);
+        });
       } else {
         logger.error('Invalid user.');
         next(errors.defaultError(`Invalid user`));
@@ -105,7 +109,8 @@ exports.admin = (req, res, next) => {
       lastName: req.body.lastName,
       password: req.body.password,
       email: req.body.email,
-      admin: false
+      admin: false,
+      isActive: false
     }
   })
     .spread((user, created) => {
@@ -123,6 +128,20 @@ exports.admin = (req, res, next) => {
         logger.error(`Invalid user`);
         next(errors.defaultError(`Invalid user`));
       }
+    })
+    .catch(reason => {
+      logger.error(`Database error - ${reason}`);
+      next(errors.defaultError(`Database error - ${reason}`));
+    });
+};
+
+exports.invalidateAll = (req, res, next) => {
+  return User.findAndCountAll()
+    .then(data => {
+      User.update({ isActive: false }, { where: { isActive: true } }).then(() => {
+        logger.info(`${data.count} users were invalidated.`);
+        res.status(200).send({ message: 'All users invaliudated.' });
+      });
     })
     .catch(reason => {
       logger.error(`Database error - ${reason}`);

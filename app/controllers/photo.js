@@ -3,6 +3,7 @@ const errors = require('../errors'),
   logger = require('../logger');
 
 exports.list = (req, res, next) => {
+  logger.info(`Requering album ${req.params.id} of user ${req.body.id}`);
   albumsService
     .getPhotosforPurchasedAlbum(req.body.id, req.params.id)
     .then(data => {

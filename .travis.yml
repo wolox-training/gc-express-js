@@ -27,3 +27,4 @@ before_script:
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE db_venta_albumes_test TO venta_albumes;"
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE db_venta_albumes TO venta_albumes;"
   - node_modules/.bin/sequelize db:migrate
+  - NODE_ENV=testing npm run migrations

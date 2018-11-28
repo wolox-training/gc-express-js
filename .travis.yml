@@ -21,5 +21,9 @@ services:
   - postgresql
 
 before_script:
-  - psql -c "CREATE DATABASE bookstest;" -U postgres
+  - psql -c "CREATE DATABASE db_venta_albumes_test;"
+  - psql -c "CREATE DATABASE db_venta_albumes;"
+  - psql -c "CREATE USER venta_albumes WITH ENCRYPTED PASSWORD '1234';"
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE db_venta_albumes_test TO venta_albumes;"
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE db_venta_albumes TO venta_albumes;"
   - node_modules/.bin/sequelize db:migrate

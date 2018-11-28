@@ -1,5 +1,6 @@
 const users = require('./controllers/user'),
   albums = require('./controllers/album'),
+  photos = require('./controllers/photo'),
   usersParameterValidator = require('./middlewares/usersValidator'),
   emailValidator = require('./middlewares/emailValidator'),
   tokenHeaderValidator = require('./middlewares/tokenHeaderValidator'),
@@ -14,4 +15,5 @@ exports.init = app => {
   app.get('/albums', [tokenHeaderValidator.handle], albums.list);
   app.post('/albums/:id', [tokenHeaderValidator.handle], albums.buy);
   app.get('/users/:user_id/albums', [tokenHeaderValidator.handle], albums.listAll);
+  app.get('/users/albums/:id/photos', [tokenHeaderValidator.handle], photos.list);
 };

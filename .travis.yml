@@ -1,9 +1,12 @@
 language: node_js
 
 node_js:
-  - "8.9.4"
+  - "8.12.0"
 
 sudo: true
+
+before_install:
+  - eval npm install
 
 env:
   - CXX=g++-4.8

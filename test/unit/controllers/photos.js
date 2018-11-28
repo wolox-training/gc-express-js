@@ -7,15 +7,27 @@ const _ = require('lodash'),
   factory = require('factory-girl').factory,
   faker = require('faker'),
   mocks = require('../support/mocks'),
-  jwt = require('../../../app/tools/jwtToken');
+  jwt = require('../../../app/tools/jwtToken'),
+  moment = require('moment'),
+  expirationTime = process.env.SESSION_EXP;
 
 chai.use(chaiHttp);
 
 describe('Controller: Album GET, `src/controller/album`', () => {
   let userTest = {};
   let userBuy = {};
-  const token = jwt.createToken({ userId: 1 });
-  const tokenBuy = jwt.createToken({ userId: 2 });
+  const token = jwt.createToken({
+    userId: 1,
+    expiresIn: moment()
+      .add(expirationTime, 'second')
+      .valueOf()
+  });
+  const tokenBuy = jwt.createToken({
+    userId: 2,
+    expiresIn: moment()
+      .add(expirationTime, 'second')
+      .valueOf()
+  });
 
   beforeEach(done => {
     mocks.mockAlbums();

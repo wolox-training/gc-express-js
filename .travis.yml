@@ -1,9 +1,12 @@
 language: node_js
 
 node_js:
-  - "8.9.4"
+  - "8.12.0"
 
 sudo: true
+
+before_install:
+  - eval npm install
 
 env:
   - CXX=g++-4.8
@@ -18,5 +21,10 @@ services:
   - postgresql
 
 before_script:
-  - psql -c "CREATE DATABASE db_venta_albumes_test;" -U venta_albumes
+  - psql -c "CREATE DATABASE db_venta_albumes_test;"
+  - psql -c "CREATE DATABASE db_venta_albumes;"
+  - psql -c "CREATE USER venta_albumes WITH ENCRYPTED PASSWORD '1234';"
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE db_venta_albumes_test TO venta_albumes;"
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE db_venta_albumes TO venta_albumes;"
   - node_modules/.bin/sequelize db:migrate
+  - NODE_ENV=testing npm run migrations

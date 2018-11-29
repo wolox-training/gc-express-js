@@ -57,10 +57,7 @@ exports.generateToken = (req, res, next) => {
           firstName: user.firstName,
           lastName: user.lastName,
           sessionToken: token,
-          admin: user.admin,
-          isActive: true,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          admin: user.admin
         };
 
         user.update({ isActive: true }).then(() => {
@@ -135,11 +132,11 @@ exports.admin = (req, res, next) => {
 };
 
 exports.invalidateAll = (req, res, next) => {
-  return User.findAndCountAll()
-    .then(data => {
-      User.update({ isActive: false }, { where: { isActive: true } }).then(() => {
-        logger.info(`${data.count} users were invalidated.`);
-        res.status(200).send({ message: 'All users invaliudated.' });
+  return User.findOne({ where: { email: req.body.email } })
+    .then(user => {
+      user.update({ isActive: false }).then(() => {
+        logger.info(`${user.email} was invalidated.`);
+        res.status(200).send({ user, message: `${user.email} was invalidated.` });
       });
     })
     .catch(reason => {

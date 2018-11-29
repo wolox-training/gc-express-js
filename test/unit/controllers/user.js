@@ -464,30 +464,25 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     factory.create('user').then(user => {
       userTest = user.dataValues;
       userTest.sessionToken = token;
-      factory
-        .createMany('user', 5, [
-          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
-          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
-          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
-          { email: `${faker.internet.userName()}@wolox.com`, isActive: true },
-          { email: `${faker.internet.userName()}@wolox.com`, isActive: true }
-        ])
-        .then(() => {
-          done();
-        });
+      userTest.isActive = true;
+      done();
     });
   });
 
-  context('When requesting to invalidate all users', () => {
-    it('should invalidate all users ', done => {
+  context('When requesting to invalidate some user', () => {
+    it('should invalidate user ', done => {
       chai
         .request(server)
         .post('/users/sessions/invalidate_all')
         .send(userTest)
         .then(res => {
           expect(res).to.have.status(200);
-          expect(res.body.message).to.equal('All users invaliudated.');
-          done();
+          expect(res.body.message).to.equal(`${userTest.email} was invalidated.`);
+          expect(res.body.user.isActive).to.equal(false);
+          User.findOne({ where: { email: userTest.email } }).then(user => {
+            expect(user.isActive).to.equal(false);
+            done();
+          });
         });
     });
   });

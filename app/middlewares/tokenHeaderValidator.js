@@ -13,7 +13,7 @@ exports.handle = (req, res, next) => {
     }
   });
   User.findOne({ where: { email: req.body.email } }).then(user => {
-    if (user.isActive === false) {
+    if (user && user.isActive === false) {
       next(errors.defaultError('Expired token!'));
     }
   });

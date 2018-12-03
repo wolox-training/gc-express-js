@@ -131,7 +131,7 @@ exports.admin = (req, res, next) => {
     });
 };
 
-exports.invalidateAll = (req, res, next) => {
+exports.invalidateAuthToken = (req, res, next) => {
   return User.findOne({ where: { email: req.body.email } })
     .then(user => {
       user.update({ isActive: false }).then(() => {

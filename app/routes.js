@@ -16,5 +16,5 @@ exports.init = app => {
   app.post('/albums/:id', [tokenHeaderValidator.handle], albums.buy);
   app.get('/users/:user_id/albums', [tokenHeaderValidator.handle], albums.listAll);
   app.get('/users/albums/:id/photos', [tokenHeaderValidator.handle], photos.list);
-  app.post('/users/sessions/invalidate_all', [], users.invalidateAll);
+  app.post('/users/sessions/invalidate_all', [tokenHeaderValidator.handle], users.invalidateAuthToken);
 };

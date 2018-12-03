@@ -11,7 +11,8 @@ exports.userPost = (req, res, next) => {
     lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password,
-    admin: req.body.admin
+    admin: req.body.admin,
+    isActive: false
   });
 
   return createUser
@@ -56,15 +57,15 @@ exports.generateToken = (req, res, next) => {
           firstName: user.firstName,
           lastName: user.lastName,
           sessionToken: token,
-          admin: user.admin,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          admin: user.admin
         };
 
-        logger.info(
-          `User ${user.firstName} ${user.lastName} authenticated. Expiration time: ${expirationTime}.`
-        );
-        res.status(200).send(userWithToken);
+        user.update({ isActive: true }).then(() => {
+          logger.info(
+            `User ${user.firstName} ${user.lastName} authenticated. Expiration time: ${expirationTime}.`
+          );
+          res.status(200).send(userWithToken);
+        });
       } else {
         logger.error('Invalid user.');
         next(errors.defaultError(`Invalid user`));
@@ -123,6 +124,20 @@ exports.admin = (req, res, next) => {
         logger.error(`Invalid user`);
         next(errors.defaultError(`Invalid user`));
       }
+    })
+    .catch(reason => {
+      logger.error(`Database error - ${reason}`);
+      next(errors.defaultError(`Database error - ${reason}`));
+    });
+};
+
+exports.invalidateAuthToken = (req, res, next) => {
+  return User.findOne({ where: { email: req.body.email } })
+    .then(user => {
+      user.update({ isActive: false }).then(() => {
+        logger.info(`${user.email} was invalidated.`);
+        res.status(200).send({ user, message: `${user.email} was invalidated.` });
+      });
     })
     .catch(reason => {
       logger.error(`Database error - ${reason}`);

@@ -450,3 +450,40 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 });
+
+describe('Controller: Users POST, `src/controller/user`', () => {
+  let userTest = {};
+  const token = jwt.createToken({
+    userId: 1,
+    expiresIn: moment()
+      .add(expirationTime, 'seconds')
+      .valueOf()
+  });
+
+  beforeEach(done => {
+    factory.create('user').then(user => {
+      userTest = user.dataValues;
+      userTest.sessionToken = token;
+      userTest.isActive = true;
+      done();
+    });
+  });
+
+  context('When requesting to invalidate some user', () => {
+    it('should invalidate user ', done => {
+      chai
+        .request(server)
+        .post('/users/sessions/invalidate_all')
+        .send(userTest)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res.body.message).to.equal(`${userTest.email} was invalidated.`);
+          expect(res.body.user.isActive).to.equal(false);
+          User.findOne({ where: { email: userTest.email } }).then(user => {
+            expect(user.isActive).to.equal(false);
+            done();
+          });
+        });
+    });
+  });
+});

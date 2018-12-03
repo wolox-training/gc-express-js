@@ -1,6 +1,7 @@
 const request = require('request-promise'),
   jsonplaceholder = 'https://jsonplaceholder.typicode.com/',
-  Purchase = require('../models').purchase;
+  Purchase = require('../models').purchase,
+  logger = require('../logger');
 
 exports.getAlbums = () =>
   request({
@@ -31,6 +32,9 @@ exports.getPhotosforPurchasedAlbum = (userId, albumId) => {
       return purchase.albumId;
     })
     .then(() => {
+      logger.info(
+        `Requering album ${albumId} of user ${userId} to ${jsonplaceholder}albums/${albumId}/photos`
+      );
       return request({
         method: 'GET',
         uri: `${jsonplaceholder}albums/${albumId}/photos`,

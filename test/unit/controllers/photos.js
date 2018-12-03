@@ -96,7 +96,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
         .send(userTest)
         .then(res => {
           expect(res).to.have.status(500);
-          expect(res.body.message).to.equal('Database error - Error: Album not purchased');
+          expect(res.body.message).to.equal('Photos not found - Error: Album not purchased');
           done();
         });
     });

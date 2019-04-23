@@ -4,11 +4,11 @@ const errors = require('../errors'),
 
 exports.list = (req, res, next) => {
   logger.info(`Requering album ${req.params.id} of user ${req.body.id}`);
-  albumsService
+  return albumsService
     .getPhotosforPurchasedAlbum(req.body.id, req.params.id)
     .then(data => {
       logger.info(`Photos found!`);
-      res.status(200).json(data);
+      return res.status(200).json(data);
     })
     .catch(error => {
       logger.error(`Photos not found - ${error}`);

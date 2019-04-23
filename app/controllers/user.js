@@ -18,7 +18,7 @@ exports.userPost = (req, res, next) => {
   return createUser
     .then(user => {
       logger.info(`Created user ${user.firstName} ${user.lastName}.`);
-      res.status(201).send({ user, message: 'Created user.' });
+      return res.status(201).send({ user, message: 'Created user.' });
     })
     .catch(reason => {
       logger.error(`Database error - ${reason}`);
@@ -32,7 +32,7 @@ exports.getUser = (req, res, next) => {
   return userFound
     .then(user => {
       logger.info(`User ${user.firstName} ${user.lastName} found.`);
-      res.status(200).send({ user, message: 'User found.' });
+      return res.status(200).send({ user, message: 'User found.' });
     })
     .catch(reason => {
       logger.error(`Database error - ${reason}`);
@@ -60,11 +60,11 @@ exports.generateToken = (req, res, next) => {
           admin: user.admin
         };
 
-        user.update({ isActive: true }).then(() => {
+        return user.update({ isActive: true }).then(() => {
           logger.info(
             `User ${user.firstName} ${user.lastName} authenticated. Expiration time: ${expirationTime}.`
           );
-          res.status(200).send(userWithToken);
+          return res.status(200).send(userWithToken);
         });
       } else {
         logger.error('Invalid user.');
@@ -77,7 +77,7 @@ exports.generateToken = (req, res, next) => {
     });
 };
 
-exports.list = (req, res, next) => {
+exports.list = (req, res, next) =>
   User.findAndCountAll()
     .then(data => {
       const page = req.query.page && req.query.page >= 1 ? req.query.page : 1, // page number
@@ -90,14 +90,13 @@ exports.list = (req, res, next) => {
         order: [['id', 'ASC']]
       }).then(users => {
         logger.info('List of users');
-        res.status(200).json({ result: users, count: data.count, pages });
+        return res.status(200).json({ result: users, count: data.count, pages });
       });
     })
     .catch(error => {
       logger.error(`Database error - ${error}`);
       next(errors.defaultError(`Database error - ${error}`));
     });
-};
 
 exports.admin = (req, res, next) => {
   return User.findOrCreate({
@@ -111,14 +110,14 @@ exports.admin = (req, res, next) => {
   })
     .spread((user, created) => {
       if (created) {
-        user.update({ admin: true }).then(() => {
+        return user.update({ admin: true }).then(() => {
           logger.info(`Admin ${user.firstName} ${user.lastName} created.`);
-          res.status(201).send(user);
+          return res.status(201).send(user);
         });
       } else if (user.admin === false) {
-        user.update({ admin: true }).then(() => {
+        return user.update({ admin: true }).then(() => {
           logger.info(`User ${user.firstName} ${user.lastName} updated to admin.`);
-          res.status(200).send(user);
+          return res.status(200).send(user);
         });
       } else {
         logger.error(`Invalid user`);
@@ -134,9 +133,9 @@ exports.admin = (req, res, next) => {
 exports.invalidateAuthToken = (req, res, next) => {
   return User.findOne({ where: { email: req.body.email } })
     .then(user => {
-      user.update({ isActive: false }).then(() => {
+      return user.update({ isActive: false }).then(() => {
         logger.info(`${user.email} was invalidated.`);
-        res.status(200).send({ user, message: `${user.email} was invalidated.` });
+        return res.status(200).send({ user, message: `${user.email} was invalidated.` });
       });
     })
     .catch(reason => {

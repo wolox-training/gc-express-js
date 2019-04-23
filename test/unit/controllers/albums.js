@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-identical-title */
 // Require the dev-dependencies
 const _ = require('lodash'),
   chai = require('chai'),

@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-identical-title */
 // Require the dev-dependencies
 const _ = require('lodash'),
   chai = require('chai'),
@@ -337,9 +338,6 @@ describe('Controller: Users POST, `src/controller/user`', () => {
           expect(res).to.have.status(200);
           expect(res.body.admin).to.equal(true);
           done();
-        })
-        .catch(err => {
-          console.log(err);
         });
     });
   });

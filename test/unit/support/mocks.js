@@ -41,3 +41,16 @@ exports.mockPhotosForAlbumId = albumId => {
     .get(`/albums/${albumId}/photos`)
     .reply(202, response);
 };
+
+exports.albums = [
+  {
+    userId: 1,
+    id: 1,
+    title: 'quidem molestiae enim'
+  },
+  {
+    userId: 1,
+    id: 2,
+    title: 'sunt qui excepturi placeat culpa'
+  }
+];

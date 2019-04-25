@@ -8,7 +8,9 @@ const express = require('express'),
   errors = require('./app/middlewares/errors'),
   migrationsManager = require('./migrations'),
   logger = require('./app/logger'),
-  dotenv = require('dotenv').config(),
+  schema = require('./app/graphql'),
+  graphqlHTTP = require('express-graphql'),
+  errorHandler = require('./app/middlewares/errors'),
   DEFAULT_BODY_SIZE_LIMIT = 1024 * 1024 * 10,
   DEFAULT_PARAMETER_LIMIT = 10000;
 
@@ -60,6 +62,15 @@ const init = () => {
         environment: config.common.rollbar.environment || config.environment
       });
       app.use(rollbar.errorHandler());
+
+      app.use(
+        '/',
+        graphqlHTTP((_, res) => ({
+          schema,
+          graphiql: config.isDevelopment,
+          formatError: err => errorHandler.handle(err, res)
+        }))
+      );
 
       app.listen(port);
 

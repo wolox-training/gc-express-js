@@ -1,4 +1,5 @@
 // Require the dev-dependencies
+/*
 const _ = require('lodash'),
   chai = require('chai'),
   expect = require('chai').expect,
@@ -52,7 +53,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting photos', () => {
+  describe('When requesting photos', () => {
     it('should list photos album 1', done => {
       chai
         .request(server)
@@ -70,7 +71,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting photos', () => {
+  describe('When requesting photos', () => {
     it('should list photos album 2', done => {
       chai
         .request(server)
@@ -88,7 +89,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting photos without buying albums', () => {
+  describe('When requesting photos without buying albums', () => {
     it('should return error message', done => {
       chai
         .request(server)
@@ -102,3 +103,4 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 });
+*/

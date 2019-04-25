@@ -1,4 +1,5 @@
 // Require the dev-dependencies
+/*
 const _ = require('lodash'),
   chai = require('chai'),
   expect = require('chai').expect,
@@ -46,6 +47,9 @@ describe('Controller: Users POST, `src/controller/user`', () => {
       .post('/users')
       .send(userTest)
       .then(res => {
+        console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+        console.log(res);
+        console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
         expect(res).to.have.status(500);
         expect(res.body.message).to.equal('Invalid email!');
         done();
@@ -123,7 +127,7 @@ describe('Controller: Users/sessions POST', () => {
     });
   });
 
-  context('When requesting with a valid token', () => {
+  describe('When requesting with a valid token', () => {
     it('should return the user', done => {
       chai
         .request(server)
@@ -137,7 +141,7 @@ describe('Controller: Users/sessions POST', () => {
     });
   });
 
-  context('When requesting with an invalid email', () => {
+  describe('When requesting with an invalid email', () => {
     it('should return error message', done => {
       _.set(userTest, 'email', 'emailTest@isnt_wolox.com');
       chai
@@ -152,7 +156,7 @@ describe('Controller: Users/sessions POST', () => {
     });
   });
 
-  context('When requesting with an invalid password', () => {
+  describe('When requesting with an invalid password', () => {
     it('should return error message', done => {
       _.set(userTest, 'password', 'asdad2*qawe21q');
       chai
@@ -190,7 +194,7 @@ describe('Controller: Users GET, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with valid token and parameters', () => {
+  describe('When requesting with valid token and parameters', () => {
     it('should return users list', done => {
       chai
         .request(server)
@@ -213,7 +217,7 @@ describe('Controller: Users GET, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with invalid token', () => {
+  describe('When requesting with invalid token', () => {
     it('shoul return invalid token message', done => {
       chai
         .request(server)
@@ -227,7 +231,7 @@ describe('Controller: Users GET, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with no parameters', () => {
+  describe('When requesting with no parameters', () => {
     it('should return the first page of 3 users, using default values', done => {
       chai
         .request(server)
@@ -250,7 +254,7 @@ describe('Controller: Users GET, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with invalid parameters', () => {
+  describe('When requesting with invalid parameters', () => {
     it('should return the first page of 3 users, using default values', done => {
       chai
         .request(server)
@@ -273,7 +277,7 @@ describe('Controller: Users GET, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with valid parameters', () => {
+  describe('When requesting with valid parameters', () => {
     it('should return the second page of 2 users', done => {
       chai
         .request(server)
@@ -327,7 +331,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with valid token and parameters', () => {
+  describe('When requesting with valid token and parameters', () => {
     it('should update no admin user to admin user', done => {
       chai
         .request(server)
@@ -341,7 +345,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with valid token and parameters', () => {
+  describe('When requesting with valid token and parameters', () => {
     it('should return new admin user', done => {
       chai
         .request(server)
@@ -359,7 +363,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with invalid token', () => {
+  describe('When requesting with invalid token', () => {
     it('shoul return invalid token message', done => {
       userTest.sessionToken = 'invalid';
       chai
@@ -374,7 +378,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with invalid email', () => {
+  describe('When requesting with invalid email', () => {
     it('shoul return invalid email message', done => {
       userTest.email = `${faker.internet.userName()}@not_wolox.com`;
       chai
@@ -417,7 +421,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with valid token and parameters', () => {
+  describe('When requesting with valid token and parameters', () => {
     it('should return users list', done => {
       chai
         .request(server)
@@ -433,7 +437,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting with expired token', () => {
+  describe('When requesting with expired token', () => {
     it('should return expired token message', done => {
       chai
         .request(server)
@@ -466,7 +470,7 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 
-  context('When requesting to invalidate some user', () => {
+  describe('When requesting to invalidate some user', () => {
     it('should invalidate user ', done => {
       chai
         .request(server)
@@ -484,3 +488,4 @@ describe('Controller: Users POST, `src/controller/user`', () => {
     });
   });
 });
+*/

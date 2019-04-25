@@ -1,4 +1,5 @@
 // Require the dev-dependencies
+/*
 const _ = require('lodash'),
   chai = require('chai'),
   expect = require('chai').expect,
@@ -33,7 +34,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting with a valid token', () => {
+  describe('When requesting with a valid token', () => {
     it('should return the albums', done => {
       chai
         .request(server)
@@ -47,7 +48,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting with an invalid token', () => {
+  describe('When requesting with an invalid token', () => {
     it('should return invalid token message', done => {
       userTest.sessionToken = 'invalid token';
       chai
@@ -82,7 +83,7 @@ describe('Controller: Album POST, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting with a valid token', () => {
+  describe('When requesting with a valid token', () => {
     it('should buy album 1', done => {
       chai
         .request(server)
@@ -98,7 +99,7 @@ describe('Controller: Album POST, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting with a valid token', () => {
+  describe('When requesting with a valid token', () => {
     it('should buy album 2', done => {
       chai
         .request(server)
@@ -114,7 +115,7 @@ describe('Controller: Album POST, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting with a valid token and try to buy same album twice', () => {
+  describe('When requesting with a valid token and try to buy same album twice', () => {
     it('should return error message', done => {
       chai
         .request(server)
@@ -140,7 +141,7 @@ describe('Controller: Album POST, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting with a invalid token', () => {
+  describe('When requesting with a invalid token', () => {
     it('should return invalid token message', done => {
       userTest.sessionToken = 'invalid token';
       chai
@@ -197,7 +198,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting albums with admin', () => {
+  describe('When requesting albums with admin', () => {
     it('should list albums user 2', done => {
       chai
         .request(server)
@@ -213,7 +214,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting albums with not admin', () => {
+  describe('When requesting albums with not admin', () => {
     it('should return error message', done => {
       userTest.admin = false;
       chai
@@ -228,7 +229,7 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 
-  context('When requesting owns albums', () => {
+  describe('When requesting owns albums', () => {
     it('should return owns albums', done => {
       chai
         .request(server)
@@ -244,3 +245,4 @@ describe('Controller: Album GET, `src/controller/album`', () => {
     });
   });
 });
+*/

@@ -1,16 +1,11 @@
 const express = require('express'),
   bodyParser = require('body-parser'),
-  Rollbar = require('rollbar'),
   morgan = require('morgan'),
   path = require('path'),
+  cors = require('cors'),
   config = require('./config'),
   routes = require('./app/routes'),
   errors = require('./app/middlewares/errors'),
-  migrationsManager = require('./migrations'),
-  logger = require('./app/logger'),
-  schema = require('./app/graphql'),
-  graphqlHTTP = require('express-graphql'),
-  errorHandler = require('./app/middlewares/errors'),
   DEFAULT_BODY_SIZE_LIMIT = 1024 * 1024 * 10,
   DEFAULT_PARAMETER_LIMIT = 10000;
 
@@ -25,57 +20,27 @@ const bodyParserUrlencodedConfig = () => ({
   limit: config.common.api.bodySizeLimit || DEFAULT_BODY_SIZE_LIMIT
 });
 
-const init = () => {
-  const app = express();
-  const port = config.common.port || 8080;
-  module.exports = app;
+const app = express();
 
-  app.use('/docs', express.static(path.join(__dirname, 'docs')));
+app.use(cors());
 
-  // Client must send "Content-Type: application/json" header
-  app.use(bodyParser.json(bodyParserJsonConfig()));
-  app.use(bodyParser.urlencoded(bodyParserUrlencodedConfig()));
+app.use('/docs', express.static(path.join(__dirname, 'docs')));
 
-  if (!config.isTesting) {
-    morgan.token('req-params', req => req.params);
-    app.use(
-      morgan(
-        '[:date[clf]] :remote-addr - Request ":method :url" with params: :req-params. Response status: :status.'
-      )
-    );
-  }
+// Client must send "Content-Type: application/json" header
+app.use(bodyParser.json(bodyParserJsonConfig()));
+app.use(bodyParser.urlencoded(bodyParserUrlencodedConfig()));
 
-  Promise.resolve()
-    .then(() => {
-      if (!config.isTesting) {
-        return migrationsManager.check();
-      }
-    })
-    .then(() => {
-      routes.init(app);
+if (!config.isTesting) {
+  morgan.token('req-params', req => req.params);
+  app.use(
+    morgan(
+      '[:date[clf]] :remote-addr - Request ":method :url" with params: :req-params. Response status: :status.'
+    )
+  );
+}
 
-      app.use(errors.handle);
+routes.init(app);
 
-      const rollbar = new Rollbar({
-        accessToken: config.common.rollbar.accessToken,
-        enabled: !!config.common.rollbar.accessToken,
-        environment: config.common.rollbar.environment || config.environment
-      });
-      app.use(rollbar.errorHandler());
+app.use(errors.handle);
 
-      app.use(
-        '/',
-        graphqlHTTP((_, res) => ({
-          schema,
-          graphiql: config.isDevelopment,
-          formatError: err => errorHandler.handle(err, res)
-        }))
-      );
-
-      app.listen(port);
-
-      logger.info(`Listening on port: ${port}`);
-    })
-    .catch(logger.error);
-};
-init();
+module.exports = app;
